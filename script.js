@@ -1,5 +1,5 @@
-// Затримка між етапами — 3 секунди
-const DELAY_MS = 3 * 1000;
+// Затримка між етапами — 30 секунд для тестування
+const DELAY_MS = 30 * 1000; // 30 секунд
 const STORAGE_KEY = 'dateRandomizerState';
 const USER_ID_KEY = 'userId';
 
@@ -19,7 +19,8 @@ const dateOptions = {
         { text: "Кав'ярня Арома", image: "https://picsum.photos/seed/coffee1/400/300" },
         { text: "Cafe de Paris", image: "https://picsum.photos/seed/coffee2/400/300" },
         { text: "Starbucks", image: "https://picsum.photos/seed/coffee3/400/300" }
-      ]
+      ],
+      icon: "☕"
     },
     {
       question: "Прогуляємся? а саме сюди:",
@@ -27,7 +28,8 @@ const dateOptions = {
         { text: "Центральний парк", image: "https://picsum.photos/seed/park1/400/300" },
         { text: "Набережна річки", image: "https://picsum.photos/seed/river/400/300" },
         { text: "Старе місто", image: "https://picsum.photos/seed/oldtown/400/300" }
-      ]
+      ],
+      icon: "🚶"
     },
     {
       question: "Будемо йти на фільм? давай на цей...",
@@ -35,7 +37,8 @@ const dateOptions = {
         { text: "Романтична комедія", image: "https://picsum.photos/seed/movie1/400/300" },
         { text: "Фантастичний екшн", image: "https://picsum.photos/seed/movie2/400/300" },
         { text: "Драма", image: "https://picsum.photos/seed/movie3/400/300" }
-      ]
+      ],
+      icon: "🎬"
     },
     {
       question: "Де вечеряємо?",
@@ -43,7 +46,8 @@ const dateOptions = {
         { text: "Італійський ресторан", image: "https://picsum.photos/seed/dinner1/400/300" },
         { text: "Японське бістро", image: "https://picsum.photos/seed/dinner2/400/300" },
         { text: "Домашня піца", image: "https://picsum.photos/seed/dinner3/400/300" }
-      ]
+      ],
+      icon: "🍽️"
     },
     {
       question: "Тепер за твоє 'терпіння' - давай виберемо тобі міні подарунок.",
@@ -51,7 +55,8 @@ const dateOptions = {
         { text: "Квітка", image: "https://picsum.photos/seed/flower/400/300" },
         { text: "Шоколадка", image: "https://picsum.photos/seed/chocolate/400/300" },
         { text: "Брелок", image: "https://picsum.photos/seed/keychain/400/300" }
-      ]
+      ],
+      icon: "🎁"
     }
   ]
 };
@@ -61,8 +66,6 @@ let state = {};
 document.addEventListener('DOMContentLoaded', () => {
   initState();
   setupDOM();
-
-  // Зберігаємо стан перед закриттям або оновленням сторінки
   window.addEventListener('beforeunload', saveState);
 });
 
@@ -72,24 +75,29 @@ function initState() {
     try {
       state = JSON.parse(saved);
       console.log('Loaded state from localStorage:', state);
-      // Перевірка, чи відповідає userId
       if (!state.userId || state.userId !== userId) {
         console.log('User ID mismatch detected, resetting state');
         resetState();
-      }
-      // Перевірка, чи відповідає кількість етапів
-      else if (!state.stages || state.stages.length !== dateOptions.stages.length) {
+      } else if (!state.stages || state.stages.length !== dateOptions.stages.length) {
         console.log('Stage count mismatch detected, resetting state');
         resetState();
-      }
-      // Перевірка, чи всі необхідні поля присутні
-      else {
+      } else {
         let isValid = true;
-        if (typeof state.firstIntroDone !== 'boolean' || typeof state.introDone !== 'boolean') {
+        if (
+          typeof state.firstIntroDone !== 'boolean' ||
+          typeof state.introDone !== 'boolean' ||
+          typeof state.mysteryDone !== 'boolean' ||
+          typeof state.lockedEventsDone !== 'boolean' ||
+          typeof state.funPromiseDone !== 'boolean'
+        ) {
           console.log('Intro state invalid, resetting state');
           isValid = false;
         }
-        if (typeof state.lastActiveStage !== 'number' || state.lastActiveStage < 0 || state.lastActiveStage >= dateOptions.stages.length) {
+        if (
+          typeof state.lastActiveStage !== 'number' ||
+          state.lastActiveStage < 0 ||
+          state.lastActiveStage >= dateOptions.stages.length
+        ) {
           console.log('lastActiveStage invalid, resetting to 0');
           state.lastActiveStage = 0;
         }
@@ -103,8 +111,12 @@ function initState() {
             isValid = false;
           }
         });
-        if (typeof state.farewellUnlockTime !== 'number' && state.farewellUnlockTime !== null) {
-          console.log('farewellUnlockTime invalid, resetting state');
+        if (
+          state.pendingStage !== null &&
+          state.pendingStage !== 'farewell' &&
+          (typeof state.pendingStage !== 'number' || state.pendingStage >= dateOptions.stages.length)
+        ) {
+          console.log('pendingStage invalid, resetting state');
           isValid = false;
         }
         if (!isValid) {
@@ -123,19 +135,23 @@ function initState() {
 }
 
 function resetState() {
-  state = { 
-    userId: userId, 
-    stages: [], 
-    lastActiveStage: 0, 
-    firstIntroDone: false, 
+  state = {
+    userId: userId,
+    stages: [],
+    lastActiveStage: 0,
+    firstIntroDone: false,
     introDone: false,
-    farewellUnlockTime: null
+    mysteryDone: false,
+    lockedEventsDone: false,
+    funPromiseDone: false,
+    pendingStage: null,
+    pendingUnlockTime: null
   };
   dateOptions.stages.forEach((_, i) => {
-    state.stages.push({ 
-      selectedIndex: null, 
-      confirmed: false, 
-      unlockTime: i === 0 ? 0 : null // Перший етап завжди розблокований
+    state.stages.push({
+      selectedIndex: null,
+      confirmed: false,
+      unlockTime: i === 0 ? 0 : null
     });
   });
   console.log('State reset:', state);
@@ -154,24 +170,41 @@ function saveState() {
 function setupDOM() {
   const intro = document.getElementById('intro');
   const anecdote = document.getElementById('anecdote');
+  const mystery = document.getElementById('mystery');
+  const lockedEvents = document.getElementById('lockedEvents');
+  const funPromise = document.getElementById('funPromise');
   const stageContainer = document.getElementById('stageContainer');
   const final = document.getElementById('final');
   const continueBtn = document.getElementById('continueBtn');
   const startBtn = document.getElementById('startBtn');
+  const mysteryBtn = document.getElementById('mysteryBtn');
+  const lockedEventsBtn = document.getElementById('lockedEventsBtn');
+  const beginBtn = document.getElementById('beginBtn');
 
-  if (!intro || !anecdote || !stageContainer || !final || !continueBtn || !startBtn) {
+  if (
+    !intro ||
+    !anecdote ||
+    !mystery ||
+    !lockedEvents ||
+    !funPromise ||
+    !stageContainer ||
+    !final ||
+    !continueBtn ||
+    !startBtn ||
+    !mysteryBtn ||
+    !lockedEventsBtn ||
+    !beginBtn
+  ) {
     console.error('One or more required DOM elements are missing');
     return;
   }
 
-  // Спочатку створюємо всі DOM-елементи для етапів
   const progressBar = document.getElementById('progressBar');
   if (!progressBar) {
     console.error('Progress bar element not found');
     return;
   }
 
-  // Додаємо індикатори прогресу
   dateOptions.stages.forEach((_, idx) => {
     const step = document.createElement('div');
     step.className = 'step';
@@ -182,7 +215,6 @@ function setupDOM() {
     }
   });
 
-  // Створюємо всі етапи
   dateOptions.stages.forEach((stageData, idx) => {
     const section = document.createElement('section');
     section.className = 'stage locked';
@@ -236,6 +268,10 @@ function setupDOM() {
       state.stages[idx].selectedIndex = null;
       state.stages[idx].confirmed = false;
       state.stages[idx].unlockTime = idx === 0 ? 0 : null;
+      if (state.pendingStage === idx) {
+        state.pendingStage = null;
+        state.pendingUnlockTime = null;
+      }
       saveState();
       display.classList.remove('visible');
       confBtn.classList.remove('active');
@@ -246,7 +282,6 @@ function setupDOM() {
       else console.error(`Progress step not found for stage ${idx}`);
       state.lastActiveStage = idx;
       saveState();
-      // Переблоковуємо наступні етапи
       for (let i = idx + 1; i < dateOptions.stages.length; i++) {
         const nextStage = document.querySelector(`.stage[data-index="${i}"]`);
         if (nextStage) {
@@ -262,6 +297,10 @@ function setupDOM() {
           state.stages[i].selectedIndex = null;
           state.stages[i].confirmed = false;
           state.stages[i].unlockTime = null;
+          if (state.pendingStage === i) {
+            state.pendingStage = null;
+            state.pendingUnlockTime = null;
+          }
         }
       }
       saveState();
@@ -271,58 +310,105 @@ function setupDOM() {
     stageContainer.append(section);
   });
 
-  // Тепер, коли всі етапи створені, перевіряємо, чи потрібно їх розблокувати
-  if (state.firstIntroDone && state.introDone) {
+  // Логіка відображення екранів на основі стану
+  if (
+    state.firstIntroDone &&
+    state.introDone &&
+    state.mysteryDone &&
+    state.lockedEventsDone &&
+    state.funPromiseDone
+  ) {
     intro.style.display = 'none';
     anecdote.style.display = 'none';
+    mystery.style.display = 'none';
+    lockedEvents.style.display = 'none';
+    funPromise.style.display = 'none';
 
-    // Перевіряємо, чи потрібно показати фінальний екран
-    const allStagesConfirmed = state.stages.every(s => s.confirmed);
-    if (allStagesConfirmed && state.farewellUnlockTime && Date.now() >= state.farewellUnlockTime) {
-      stageContainer.style.display = 'none';
-      final.style.display = 'flex';
-      final.classList.add('fade-in');
-      unlockFarewell();
-      console.log('All stages confirmed, showing final screen');
-      return;
-    }
-
-    // Показуємо етапи
     stageContainer.style.display = 'block';
     stageContainer.classList.add('fade-in');
 
-    // Розблоковуємо етапи на основі прогресу
     let lastActive = 0;
+
+    // Розблоковуємо підтверджені етапи та перевіряємо unlockTime для наступних
     for (let i = 0; i < dateOptions.stages.length; i++) {
-      if (i === 0 || (state.stages[i - 1] && state.stages[i - 1].confirmed)) {
+      if (state.stages[i].confirmed) {
         unlockStage(i);
         lastActive = i;
-        console.log(`Stage ${i} unlocked during initialization`);
+        console.log(`Stage ${i} unlocked during initialization (confirmed)`);
+      } else if (state.stages[i].unlockTime && Date.now() >= state.stages[i].unlockTime) {
+        unlockStage(i);
+        lastActive = i;
+        console.log(`Stage ${i} unlocked during initialization (unlockTime passed)`);
       } else {
-        break;
+        break; // Зупиняємося, якщо етап не підтверджений і не розблокований
       }
     }
+
+    // Обробляємо pendingStage
+    if (state.pendingStage !== null && state.pendingUnlockTime !== null) {
+      console.log(`Processing pending stage: ${state.pendingStage}, unlock time: ${state.pendingUnlockTime}, current time: ${Date.now()}`);
+      if (state.pendingStage === 'farewell') {
+        if (Date.now() < state.pendingUnlockTime) {
+          startCountdown(state.pendingUnlockTime, 'farewell');
+          console.log(`Countdown started for farewell, remaining: ${state.pendingUnlockTime - Date.now()}ms`);
+        } else {
+          stageContainer.style.display = 'none';
+          final.style.display = 'flex';
+          final.classList.add('fade-in');
+          unlockFarewell();
+          state.pendingStage = null;
+          state.pendingUnlockTime = null;
+          saveState();
+          console.log('Showing final screen immediately, time has passed');
+        }
+      } else {
+        const pendingIdx = state.pendingStage;
+        if (pendingIdx < dateOptions.stages.length && !state.stages[pendingIdx].confirmed) {
+          if (Date.now() < state.pendingUnlockTime) {
+            startCountdown(state.pendingUnlockTime, pendingIdx);
+            console.log(`Countdown started for stage ${pendingIdx}, remaining: ${state.pendingUnlockTime - Date.now()}ms`);
+          } else {
+            unlockStage(pendingIdx);
+            state.pendingStage = null;
+            state.pendingUnlockTime = null;
+            lastActive = pendingIdx;
+            saveState();
+            console.log(`Stage ${pendingIdx} unlocked immediately, time has passed`);
+          }
+        } else {
+          // Якщо pendingStage некоректний або вже підтверджений, скидаємо
+          state.pendingStage = null;
+          state.pendingUnlockTime = null;
+          saveState();
+          console.log('Invalid or confirmed pendingStage, cleared');
+        }
+      }
+    }
+
     state.lastActiveStage = lastActive;
     saveState();
-
-    // Якщо є час розблокування для наступного етапу, запускаємо таймер
-    if (lastActive < dateOptions.stages.length - 1 && state.stages[lastActive].confirmed && state.stages[lastActive + 1].unlockTime) {
-      const nextUnlockTime = state.stages[lastActive + 1].unlockTime;
-      if (Date.now() < nextUnlockTime) {
-        startCountdown(nextUnlockTime, lastActive + 1);
-        console.log(`Countdown started for stage ${lastActive + 1}`);
-      } else {
-        unlockStage(lastActive + 1);
-        state.lastActiveStage = lastActive + 1;
-        saveState();
-        console.log(`Stage ${lastActive + 1} unlocked immediately`);
-      }
-    }
-    // Якщо всі етапи завершені, але ще є таймер для фінального екрану
-    else if (allStagesConfirmed && state.farewellUnlockTime && Date.now() < state.farewellUnlockTime) {
-      startCountdown(state.farewellUnlockTime, 'farewell');
-      console.log('Countdown started for farewell screen');
-    }
+  } else if (state.firstIntroDone && state.introDone && state.mysteryDone && state.lockedEventsDone) {
+    intro.style.display = 'none';
+    anecdote.style.display = 'none';
+    mystery.style.display = 'none';
+    lockedEvents.style.display = 'none';
+    funPromise.style.display = 'flex';
+    funPromise.classList.add('fade-in');
+  } else if (state.firstIntroDone && state.introDone && state.mysteryDone) {
+    intro.style.display = 'none';
+    anecdote.style.display = 'none';
+    mystery.style.display = 'none';
+    lockedEvents.style.display = 'flex';
+    lockedEvents.classList.add('fade-in');
+  } else if (state.firstIntroDone && state.introDone) {
+    intro.style.display = 'none';
+    anecdote.style.display = 'none';
+    mystery.style.display = 'flex';
+    mystery.classList.add('fade-in');
+  } else if (state.firstIntroDone) {
+    intro.style.display = 'none';
+    anecdote.style.display = 'flex';
+    anecdote.classList.add('fade-in');
   }
 
   continueBtn.addEventListener('click', () => {
@@ -344,12 +430,51 @@ function setupDOM() {
     anecdote.classList.add('fade-out');
     setTimeout(() => {
       anecdote.style.display = 'none';
-      stageContainer.style.display = 'block';
-      stageContainer.classList.add('fade-in');
-      state.stages[0].unlockTime = 0; // Забезпечуємо, що перший етап розблоковано
-      unlockStage(0);
+      mystery.style.display = 'flex';
+      mystery.classList.add('fade-in');
     }, 500);
     state.introDone = true;
+    saveState();
+  });
+
+  mysteryBtn.addEventListener('click', () => {
+    console.log('Mystery button clicked');
+    mystery.classList.remove('fade-in');
+    mystery.classList.add('fade-out');
+    setTimeout(() => {
+      mystery.style.display = 'none';
+      lockedEvents.style.display = 'flex';
+      lockedEvents.classList.add('fade-in');
+    }, 500);
+    state.mysteryDone = true;
+    saveState();
+  });
+
+  lockedEventsBtn.addEventListener('click', () => {
+    console.log('Locked Events button clicked');
+    lockedEvents.classList.remove('fade-in');
+    lockedEvents.classList.add('fade-out');
+    setTimeout(() => {
+      lockedEvents.style.display = 'none';
+      funPromise.style.display = 'flex';
+      funPromise.classList.add('fade-in');
+    }, 500);
+    state.lockedEventsDone = true;
+    saveState();
+  });
+
+  beginBtn.addEventListener('click', () => {
+    console.log('Begin button clicked');
+    funPromise.classList.remove('fade-in');
+    funPromise.classList.add('fade-out');
+    setTimeout(() => {
+      funPromise.style.display = 'none';
+      stageContainer.style.display = 'block';
+      stageContainer.classList.add('fade-in');
+      state.stages[0].unlockTime = 0;
+      unlockStage(0);
+    }, 500);
+    state.funPromiseDone = true;
     state.lastActiveStage = 0;
     saveState();
   });
@@ -415,12 +540,17 @@ function confirmChoice(idx, section) {
   const isLast = idx === dateOptions.stages.length - 1;
   const nextKey = isLast ? 'farewell' : idx + 1;
   const ut = Date.now() + DELAY_MS;
-  if (!isLast) state.stages[idx + 1].unlockTime = ut;
-  else state.farewellUnlockTime = ut;
+  if (!isLast) {
+    state.stages[idx + 1].unlockTime = ut;
+    state.pendingStage = idx + 1;
+  } else {
+    state.pendingStage = 'farewell';
+  }
+  state.pendingUnlockTime = ut;
   state.lastActiveStage = isLast ? idx : idx + 1;
   saveState();
 
-  console.log(`Starting countdown for ${nextKey}`);
+  console.log(`Starting countdown for ${nextKey}, unlock time: ${ut}`);
   startCountdown(ut, nextKey);
 
   const confBtn = section.querySelector('.confirm-btn');
@@ -545,17 +675,129 @@ function unlockFarewell() {
       location.reload();
     });
   });
+
+  // Генеруємо роудмеп після завершення всіх етапів
+  generateRoadmap();
+}
+
+function generateRoadmap() {
+  const roadmapContainer = document.getElementById('roadmapContainer');
+  const downloadBtn = document.getElementById('downloadRoadmapBtn');
+  if (!roadmapContainer || !downloadBtn) {
+    console.error('Roadmap container or download button not found');
+    return;
+  }
+
+  // Створюємо canvas
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Розміри canvas
+  const stageHeight = 200; // Висота одного етапу
+  const canvasWidth = 600;
+  const canvasHeight = (dateOptions.stages.length * stageHeight) + 100; // +100 для дати та відступів
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+
+  // Фон
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+  gradient.addColorStop(0, '#fce4ec');
+  gradient.addColorStop(1, '#f8bbd0');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+  // Додаємо дату зверху
+  ctx.font = 'bold 24px Poppins';
+  ctx.fillStyle = '#2d1b3e';
+  const today = new Date('2025-05-07'); // Статична дата, як у вашому запиті
+  const dateText = `Історія одного дня: ${today.toLocaleDateString('uk-UA')}`;
+  const dateTextWidth = ctx.measureText(dateText).width;
+  ctx.fillText(dateText, (canvasWidth - dateTextWidth) / 2, 40);
+
+  // Доріжка та етапи
+  const pathWidth = 10;
+  const pathX = canvasWidth / 2;
+  let currentY = 80;
+
+  // Малюємо доріжку
+  ctx.beginPath();
+  ctx.moveTo(pathX, currentY);
+  ctx.lineTo(pathX, canvasHeight - 20);
+  ctx.strokeStyle = '#ff6b81';
+  ctx.lineWidth = pathWidth;
+  ctx.stroke();
+
+  // Додаємо етапи
+  dateOptions.stages.forEach((stage, idx) => {
+    const stageState = state.stages[idx];
+    if (!stageState.confirmed || stageState.selectedIndex === null) return;
+
+    const selectedOption = stage.options[stageState.selectedIndex];
+    const stageY = currentY + (idx * stageHeight);
+
+    // Коло для етапу
+    ctx.beginPath();
+    ctx.arc(pathX, stageY + 50, 20, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd700';
+    ctx.fill();
+    ctx.strokeStyle = '#ff6b81';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Іконка етапу
+    ctx.font = '30px serif';
+    ctx.fillStyle = '#2d1b3e';
+    ctx.fillText(stage.icon, pathX - 10, stageY + 58);
+
+    // Текст етапу
+    ctx.font = 'bold 16px Poppins';
+    const stageText = `${stage.question} ${selectedOption.text}`;
+    const textWidth = ctx.measureText(stageText).width;
+    ctx.fillText(stageText, (canvasWidth - textWidth) / 2, stageY + 90);
+
+    // Зображення етапу
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // Для завантаження зображень з іншого домену
+    img.src = selectedOption.image;
+    img.onload = () => {
+      const imgWidth = 100;
+      const imgHeight = 75;
+      ctx.drawImage(img, (canvasWidth - imgWidth) / 2, stageY + 110, imgWidth, imgHeight);
+
+      // Після завантаження всіх зображень показуємо кнопку завантаження
+      if (idx === dateOptions.stages.length - 1) {
+        roadmapContainer.appendChild(canvas);
+        downloadBtn.style.display = 'inline-block';
+      }
+    };
+    img.onerror = () => {
+      console.error(`Failed to load image for stage ${idx}: ${selectedOption.image}`);
+      // У разі помилки завантаження зображення все одно показуємо кнопку
+      if (idx === dateOptions.stages.length - 1) {
+        roadmapContainer.appendChild(canvas);
+        downloadBtn.style.display = 'inline-block';
+      }
+    };
+  });
+
+  // Обробник для завантаження роудмепу
+  downloadBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'our-day-roadmap.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
 }
 
 function startCountdown(unlockTime, next) {
-  console.log(`Starting countdown, unlockTime: ${unlockTime}, next: ${next}`);
+  console.log(`Starting countdown, unlockTime: ${unlockTime}, next: ${next}, remaining: ${unlockTime - Date.now()}ms`);
   const timerElement = document.getElementById('globalTimer');
   if (!timerElement) {
     console.error('Global timer element not found');
     return;
   }
   timerElement.classList.add('active');
-  
+
   const updateTimer = () => {
     const remaining = unlockTime - Date.now();
     if (remaining <= 0) {
@@ -563,11 +805,15 @@ function startCountdown(unlockTime, next) {
       timerElement.classList.remove('active');
       if (next === 'farewell') {
         unlockFarewell();
+        state.pendingStage = null;
+        state.pendingUnlockTime = null;
       } else {
         unlockStage(next);
+        state.pendingStage = null;
+        state.pendingUnlockTime = null;
         state.lastActiveStage = next;
-        saveState();
       }
+      saveState();
       console.log(`Countdown finished, proceeding to ${next}`);
       return;
     }
@@ -576,7 +822,7 @@ function startCountdown(unlockTime, next) {
     const secs = String(seconds % 60).padStart(2, '0');
     timerElement.textContent = `Залишилось: ${minutes}:${secs}`;
   };
-  
+
   updateTimer();
   const timerInterval = setInterval(updateTimer, 1000);
 }
