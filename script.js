@@ -88,9 +88,10 @@ function initState() {
           typeof state.introDone !== 'boolean' ||
           typeof state.mysteryDone !== 'boolean' ||
           typeof state.lockedEventsDone !== 'boolean' ||
-          typeof state.funPromiseDone !== 'boolean'
+          typeof state.funPromiseDone !== 'boolean' ||
+          typeof state.farewellReached !== 'boolean'
         ) {
-          console.log('Intro state invalid, resetting state');
+          console.log('Intro or farewell state invalid, resetting state');
           isValid = false;
         }
         if (
@@ -144,6 +145,7 @@ function resetState() {
     mysteryDone: false,
     lockedEventsDone: false,
     funPromiseDone: false,
+    farewellReached: false,
     pendingStage: null,
     pendingUnlockTime: null
   };
@@ -272,6 +274,7 @@ function setupDOM() {
         state.pendingStage = null;
         state.pendingUnlockTime = null;
       }
+      state.farewellReached = false; // Скидаємо, якщо скидаємо етап
       saveState();
       display.classList.remove('visible');
       confBtn.classList.remove('active');
@@ -324,69 +327,80 @@ function setupDOM() {
     lockedEvents.style.display = 'none';
     funPromise.style.display = 'none';
 
-    stageContainer.style.display = 'block';
-    stageContainer.classList.add('fade-in');
+    // Перевіряємо, чи всі етапи підтверджені і чи досягнуто farewell
+    const allStagesConfirmed = state.stages.every(stage => stage.confirmed);
+    if (allStagesConfirmed && state.farewellReached) {
+      stageContainer.style.display = 'none';
+      final.style.display = 'flex';
+      final.classList.add('fade-in');
+      unlockFarewell();
+      console.log('All stages confirmed and farewell reached, showing final screen');
+    } else {
+      stageContainer.style.display = 'block';
+      stageContainer.classList.add('fade-in');
 
-    let lastActive = 0;
+      let lastActive = 0;
 
-    // Розблоковуємо підтверджені етапи та перевіряємо unlockTime для наступних
-    for (let i = 0; i < dateOptions.stages.length; i++) {
-      if (state.stages[i].confirmed) {
-        unlockStage(i);
-        lastActive = i;
-        console.log(`Stage ${i} unlocked during initialization (confirmed)`);
-      } else if (state.stages[i].unlockTime && Date.now() >= state.stages[i].unlockTime) {
-        unlockStage(i);
-        lastActive = i;
-        console.log(`Stage ${i} unlocked during initialization (unlockTime passed)`);
-      } else {
-        break; // Зупиняємося, якщо етап не підтверджений і не розблокований
-      }
-    }
-
-    // Обробляємо pendingStage
-    if (state.pendingStage !== null && state.pendingUnlockTime !== null) {
-      console.log(`Processing pending stage: ${state.pendingStage}, unlock time: ${state.pendingUnlockTime}, current time: ${Date.now()}`);
-      if (state.pendingStage === 'farewell') {
-        if (Date.now() < state.pendingUnlockTime) {
-          startCountdown(state.pendingUnlockTime, 'farewell');
-          console.log(`Countdown started for farewell, remaining: ${state.pendingUnlockTime - Date.now()}ms`);
+      // Розблоковуємо підтверджені етапи та перевіряємо unlockTime для наступних
+      for (let i = 0; i < dateOptions.stages.length; i++) {
+        if (state.stages[i].confirmed) {
+          unlockStage(i);
+          lastActive = i;
+          console.log(`Stage ${i} unlocked during initialization (confirmed)`);
+        } else if (state.stages[i].unlockTime && Date.now() >= state.stages[i].unlockTime) {
+          unlockStage(i);
+          lastActive = i;
+          console.log(`Stage ${i} unlocked during initialization (unlockTime passed)`);
         } else {
-          stageContainer.style.display = 'none';
-          final.style.display = 'flex';
-          final.classList.add('fade-in');
-          unlockFarewell();
-          state.pendingStage = null;
-          state.pendingUnlockTime = null;
-          saveState();
-          console.log('Showing final screen immediately, time has passed');
+          break; // Зупиняємося, якщо етап не підтверджений і не розблокований
         }
-      } else {
-        const pendingIdx = state.pendingStage;
-        if (pendingIdx < dateOptions.stages.length && !state.stages[pendingIdx].confirmed) {
+      }
+
+      // Обробляємо pendingStage
+      if (state.pendingStage !== null && state.pendingUnlockTime !== null) {
+        console.log(`Processing pending stage: ${state.pendingStage}, unlock time: ${state.pendingUnlockTime}, current time: ${Date.now()}`);
+        if (state.pendingStage === 'farewell') {
           if (Date.now() < state.pendingUnlockTime) {
-            startCountdown(state.pendingUnlockTime, pendingIdx);
-            console.log(`Countdown started for stage ${pendingIdx}, remaining: ${state.pendingUnlockTime - Date.now()}ms`);
+            startCountdown(state.pendingUnlockTime, 'farewell');
+            console.log(`Countdown started for farewell, remaining: ${state.pendingUnlockTime - Date.now()}ms`);
           } else {
-            unlockStage(pendingIdx);
+            stageContainer.style.display = 'none';
+            final.style.display = 'flex';
+            final.classList.add('fade-in');
+            unlockFarewell();
             state.pendingStage = null;
             state.pendingUnlockTime = null;
-            lastActive = pendingIdx;
+            state.farewellReached = true;
             saveState();
-            console.log(`Stage ${pendingIdx} unlocked immediately, time has passed`);
+            console.log('Showing final screen immediately, time has passed');
           }
         } else {
-          // Якщо pendingStage некоректний або вже підтверджений, скидаємо
-          state.pendingStage = null;
-          state.pendingUnlockTime = null;
-          saveState();
-          console.log('Invalid or confirmed pendingStage, cleared');
+          const pendingIdx = state.pendingStage;
+          if (pendingIdx < dateOptions.stages.length && !state.stages[pendingIdx].confirmed) {
+            if (Date.now() < state.pendingUnlockTime) {
+              startCountdown(state.pendingUnlockTime, pendingIdx);
+              console.log(`Countdown started for stage ${pendingIdx}, remaining: ${state.pendingUnlockTime - Date.now()}ms`);
+            } else {
+              unlockStage(pendingIdx);
+              state.pendingStage = null;
+              state.pendingUnlockTime = null;
+              lastActive = pendingIdx;
+              saveState();
+              console.log(`Stage ${pendingIdx} unlocked immediately, time has passed`);
+            }
+          } else {
+            // Якщо pendingStage некоректний або вже підтверджений, скидаємо
+            state.pendingStage = null;
+            state.pendingUnlockTime = null;
+            saveState();
+            console.log('Invalid or confirmed pendingStage, cleared');
+          }
         }
       }
-    }
 
-    state.lastActiveStage = lastActive;
-    saveState();
+      state.lastActiveStage = lastActive;
+      saveState();
+    }
   } else if (state.firstIntroDone && state.introDone && state.mysteryDone && state.lockedEventsDone) {
     intro.style.display = 'none';
     anecdote.style.display = 'none';
@@ -624,6 +638,9 @@ function unlockFarewell() {
   final.style.display = 'flex';
   final.classList.add('fade-in');
 
+  state.farewellReached = true;
+  saveState();
+
   const finalContent = document.querySelector('.final-content');
   const emojiPrompt = document.createElement('p');
   emojiPrompt.className = 'emoji-prompt';
@@ -710,7 +727,7 @@ function generateRoadmap() {
   ctx.font = 'bold 24px Poppins';
   ctx.fillStyle = '#2d1b3e';
   const today = new Date('2025-05-07'); // Статична дата, як у вашому запиті
-  const dateText = `Історія одного дня: ${today.toLocaleDateString('uk-UA')}`;
+  const dateText = `Історія одноо дня ${today.toLocaleDateString('uk-UA')}`;
   const dateTextWidth = ctx.measureText(dateText).width;
   ctx.fillText(dateText, (canvasWidth - dateTextWidth) / 2, 40);
 
@@ -807,6 +824,7 @@ function startCountdown(unlockTime, next) {
         unlockFarewell();
         state.pendingStage = null;
         state.pendingUnlockTime = null;
+        state.farewellReached = true;
       } else {
         unlockStage(next);
         state.pendingStage = null;
