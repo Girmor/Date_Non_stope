@@ -44,6 +44,47 @@
     </div>
   </section>
 
+  <!-- Екран привітання 3 (Загадковість) -->
+  <section id="mystery" class="screen intro-screen" style="display: none;">
+    <div class="intro-bg-anim">
+      <div class="icon cup"><i class="fas fa-coffee"></i></div>
+      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
+      <div class="icon walk"><i class="fas fa-walking"></i></div>
+    </div>
+    <div class="intro-content">
+      <h1 class="animated-text">✨ Давай додамо трішки загадковості й випадковості нашій зустрічі! 🎲</h1>
+      <p class="anecdote-text">Ти будеш обирати події, локації або заходи, натискаючи кнопку «Обрати», після чого випадковим чином відкриється цікава ідея для нашого побачення! 💫</p>
+      <button id="mysteryBtn" class="btn-large">Продовжити</button>
+    </div>
+  </section>
+
+  <!-- Екран привітання 4 (Заморожені події) -->
+  <section id="lockedEvents" class="screen intro-screen" style="display: none;">
+    <div class="intro-bg-anim">
+      <div class="icon cup"><i class="fas fa-coffee"></i></div>
+      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
+      <div class="icon walk"><i class="fas fa-walking"></i></div>
+    </div>
+    <div class="intro-content">
+      <p class="anecdote-text">🔒 Кожна наступна подія буде тимчасово «заморожена» і залишатиметься секретом 🤫. Щоб її розблокувати, потрібно провести хоча б 15 хвилин на попередній локації.</p>
+      <button id="lockedEventsBtn" class="btn-large">Продовжити</button>
+    </div>
+  </section>
+
+  <!-- Екран привітання 5 (Останній перед початком) -->
+  <section id="funPromise" class="screen intro-screen" style="display: none;">
+    <div class="intro-bg-anim">
+      <div class="icon cup"><i class="fas fa-coffee"></i></div>
+      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
+      <div class="icon walk"><i class="fas fa-walking"></i></div>
+    </div>
+    <div class="intro-content">
+      <h1 class="animated-text">Не хвилюйся — довго мучити тебе не буду 😇</h1>
+      <p class="anecdote-text">але обіцяю: буде весело, цікаво та трохи непередбачувано! 😏🎉</p>
+      <button id="beginBtn" class="btn-large">Почнемо 🚀</button>
+    </div>
+  </section>
+
   <!-- Індикатор прогресу -->
   <div id="progressBar" class="progress-bar"></div>
 
@@ -61,6 +102,9 @@
     </div>
     <div class="final-content">
       <h1 class="animated-text">Я дуже радий був провести з тобою час 🤪</h1>
+      <!-- Додаємо контейнер для роудмепу -->
+      <div id="roadmapContainer" style="text-align: center; margin: 20px 0;"></div>
+      <button id="downloadRoadmapBtn" class="btn-large" style="display: none;">Завантажити роудмеп дня</button>
     </div>
   </section>
 
