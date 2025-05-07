@@ -103,6 +103,10 @@ function initState() {
             isValid = false;
           }
         });
+        if (typeof state.farewellUnlockTime !== 'number' && state.farewellUnlockTime !== null) {
+          console.log('farewellUnlockTime invalid, resetting state');
+          isValid = false;
+        }
         if (!isValid) {
           resetState();
         }
@@ -128,7 +132,11 @@ function resetState() {
     farewellUnlockTime: null
   };
   dateOptions.stages.forEach((_, i) => {
-    state.stages.push({ selectedIndex: null, confirmed: false, unlockTime: null });
+    state.stages.push({ 
+      selectedIndex: null, 
+      confirmed: false, 
+      unlockTime: i === 0 ? 0 : null // Перший етап завжди розблокований
+    });
   });
   console.log('State reset:', state);
   saveState();
@@ -156,93 +164,14 @@ function setupDOM() {
     return;
   }
 
-  // Перевіряємо, чи користувач уже пройшов перші два екрани
-  if (state.firstIntroDone && state.introDone) {
-    intro.style.display = 'none';
-    anecdote.style.display = 'none';
-
-    // Перевіряємо, чи потрібно показати фінальний екран
-    const allStagesConfirmed = state.stages.every(s => s.confirmed);
-    if (allStagesConfirmed && state.farewellUnlockTime && Date.now() >= state.farewellUnlockTime) {
-      stageContainer.style.display = 'none';
-      final.style.display = 'flex';
-      final.classList.add('fade-in');
-      unlockFarewell();
-      console.log('All stages confirmed, showing final screen');
-      return;
-    }
-
-    // Показуємо етапи
-    stageContainer.style.display = 'block';
-    stageContainer.classList.add('fade-in');
-
-    // Розблоковуємо етапи на основі прогресу
-    let lastActive = state.lastActiveStage || 0;
-    lastActive = Math.min(lastActive, dateOptions.stages.length - 1);
-    console.log('Restoring progress, lastActiveStage:', lastActive);
-
-    for (let i = 0; i <= lastActive; i++) {
-      if (i === 0 || (state.stages[i - 1] && state.stages[i - 1].confirmed)) {
-        unlockStage(i);
-        console.log(`Stage ${i} unlocked`);
-      }
-    }
-
-    // Якщо є час розблокування для наступного етапу, запускаємо таймер
-    if (lastActive < dateOptions.stages.length - 1 && state.stages[lastActive].confirmed && state.stages[lastActive].unlockTime) {
-      const nextUnlockTime = state.stages[lastActive].unlockTime;
-      if (Date.now() < nextUnlockTime) {
-        startCountdown(nextUnlockTime, lastActive + 1);
-        console.log(`Countdown started for stage ${lastActive + 1}`);
-      } else {
-        unlockStage(lastActive + 1);
-        state.lastActiveStage = lastActive + 1;
-        saveState();
-        console.log(`Stage ${lastActive + 1} unlocked immediately`);
-      }
-    }
-    // Якщо всі етапи завершені, але ще є таймер для фінального екрану
-    else if (allStagesConfirmed && state.farewellUnlockTime && Date.now() < state.farewellUnlockTime) {
-      startCountdown(state.farewellUnlockTime, 'farewell');
-      console.log('Countdown started for farewell screen');
-    }
-  }
-
-  continueBtn.addEventListener('click', () => {
-    console.log('Continue button clicked');
-    intro.classList.remove('fade-in');
-    intro.classList.add('fade-out');
-    setTimeout(() => {
-      intro.style.display = 'none';
-      anecdote.style.display = 'flex';
-      anecdote.classList.add('fade-in');
-    }, 500);
-    state.firstIntroDone = true;
-    saveState();
-  });
-
-  startBtn.addEventListener('click', () => {
-    console.log('Start button clicked');
-    anecdote.classList.remove('fade-in');
-    anecdote.classList.add('fade-out');
-    setTimeout(() => {
-      anecdote.style.display = 'none';
-      stageContainer.style.display = 'block';
-      stageContainer.classList.add('fade-in');
-      state.stages[0].unlockTime = 0; // Забезпечуємо, що перший етап розблоковано
-      unlockStage(0);
-    }, 500);
-    state.introDone = true;
-    state.lastActiveStage = 0;
-    saveState();
-  });
-
+  // Спочатку створюємо всі DOM-елементи для етапів
   const progressBar = document.getElementById('progressBar');
   if (!progressBar) {
     console.error('Progress bar element not found');
     return;
   }
 
+  // Додаємо індикатори прогресу
   dateOptions.stages.forEach((_, idx) => {
     const step = document.createElement('div');
     step.className = 'step';
@@ -253,6 +182,7 @@ function setupDOM() {
     }
   });
 
+  // Створюємо всі етапи
   dateOptions.stages.forEach((stageData, idx) => {
     const section = document.createElement('section');
     section.className = 'stage locked';
@@ -305,6 +235,7 @@ function setupDOM() {
       console.log(`Retry button clicked for stage ${idx}`);
       state.stages[idx].selectedIndex = null;
       state.stages[idx].confirmed = false;
+      state.stages[idx].unlockTime = idx === 0 ? 0 : null;
       saveState();
       display.classList.remove('visible');
       confBtn.classList.remove('active');
@@ -315,10 +246,112 @@ function setupDOM() {
       else console.error(`Progress step not found for stage ${idx}`);
       state.lastActiveStage = idx;
       saveState();
+      // Переблоковуємо наступні етапи
+      for (let i = idx + 1; i < dateOptions.stages.length; i++) {
+        const nextStage = document.querySelector(`.stage[data-index="${i}"]`);
+        if (nextStage) {
+          nextStage.classList.add('locked');
+          const nextDisplay = nextStage.querySelector('.selected-option');
+          if (nextDisplay) nextDisplay.classList.remove('visible');
+          const nextRandBtn = nextStage.querySelector('.random-btn');
+          const nextConfBtn = nextStage.querySelector('.confirm-btn');
+          const nextRetryBtn = nextStage.querySelector('.retry-btn');
+          if (nextRandBtn) nextRandBtn.disabled = false;
+          if (nextConfBtn) nextConfBtn.classList.remove('active');
+          if (nextRetryBtn) nextRetryBtn.classList.remove('active');
+          state.stages[i].selectedIndex = null;
+          state.stages[i].confirmed = false;
+          state.stages[i].unlockTime = null;
+        }
+      }
+      saveState();
     });
 
     section.append(q, randBtn, display, confBtn, retryBtn);
     stageContainer.append(section);
+  });
+
+  // Тепер, коли всі етапи створені, перевіряємо, чи потрібно їх розблокувати
+  if (state.firstIntroDone && state.introDone) {
+    intro.style.display = 'none';
+    anecdote.style.display = 'none';
+
+    // Перевіряємо, чи потрібно показати фінальний екран
+    const allStagesConfirmed = state.stages.every(s => s.confirmed);
+    if (allStagesConfirmed && state.farewellUnlockTime && Date.now() >= state.farewellUnlockTime) {
+      stageContainer.style.display = 'none';
+      final.style.display = 'flex';
+      final.classList.add('fade-in');
+      unlockFarewell();
+      console.log('All stages confirmed, showing final screen');
+      return;
+    }
+
+    // Показуємо етапи
+    stageContainer.style.display = 'block';
+    stageContainer.classList.add('fade-in');
+
+    // Розблоковуємо етапи на основі прогресу
+    let lastActive = 0;
+    for (let i = 0; i < dateOptions.stages.length; i++) {
+      if (i === 0 || (state.stages[i - 1] && state.stages[i - 1].confirmed)) {
+        unlockStage(i);
+        lastActive = i;
+        console.log(`Stage ${i} unlocked during initialization`);
+      } else {
+        break;
+      }
+    }
+    state.lastActiveStage = lastActive;
+    saveState();
+
+    // Якщо є час розблокування для наступного етапу, запускаємо таймер
+    if (lastActive < dateOptions.stages.length - 1 && state.stages[lastActive].confirmed && state.stages[lastActive + 1].unlockTime) {
+      const nextUnlockTime = state.stages[lastActive + 1].unlockTime;
+      if (Date.now() < nextUnlockTime) {
+        startCountdown(nextUnlockTime, lastActive + 1);
+        console.log(`Countdown started for stage ${lastActive + 1}`);
+      } else {
+        unlockStage(lastActive + 1);
+        state.lastActiveStage = lastActive + 1;
+        saveState();
+        console.log(`Stage ${lastActive + 1} unlocked immediately`);
+      }
+    }
+    // Якщо всі етапи завершені, але ще є таймер для фінального екрану
+    else if (allStagesConfirmed && state.farewellUnlockTime && Date.now() < state.farewellUnlockTime) {
+      startCountdown(state.farewellUnlockTime, 'farewell');
+      console.log('Countdown started for farewell screen');
+    }
+  }
+
+  continueBtn.addEventListener('click', () => {
+    console.log('Continue button clicked');
+    intro.classList.remove('fade-in');
+    intro.classList.add('fade-out');
+    setTimeout(() => {
+      intro.style.display = 'none';
+      anecdote.style.display = 'flex';
+      anecdote.classList.add('fade-in');
+    }, 500);
+    state.firstIntroDone = true;
+    saveState();
+  });
+
+  startBtn.addEventListener('click', () => {
+    console.log('Start button clicked');
+    anecdote.classList.remove('fade-in');
+    anecdote.classList.add('fade-out');
+    setTimeout(() => {
+      anecdote.style.display = 'none';
+      stageContainer.style.display = 'block';
+      stageContainer.classList.add('fade-in');
+      state.stages[0].unlockTime = 0; // Забезпечуємо, що перший етап розблоковано
+      unlockStage(0);
+    }, 500);
+    state.introDone = true;
+    state.lastActiveStage = 0;
+    saveState();
   });
 }
 
@@ -382,7 +415,7 @@ function confirmChoice(idx, section) {
   const isLast = idx === dateOptions.stages.length - 1;
   const nextKey = isLast ? 'farewell' : idx + 1;
   const ut = Date.now() + DELAY_MS;
-  if (!isLast) state.stages[idx].unlockTime = ut;
+  if (!isLast) state.stages[idx + 1].unlockTime = ut;
   else state.farewellUnlockTime = ut;
   state.lastActiveStage = isLast ? idx : idx + 1;
   saveState();
