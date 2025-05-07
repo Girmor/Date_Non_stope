@@ -1,0 +1,355 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap');
+
+:root {
+  --primary: #ff6b81;
+  --secondary: #9c27b0;
+  --bg-gradient: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-main: #2d1b3e;
+  --shadow: rgba(0, 0, 0, 0.2);
+  --accent: #ffd700;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Фонова анітація іконок */
+.screen .intro-bg-anim,
+.screen .final-bg-anim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+.icon {
+  position: absolute;
+  font-size: 2.5em;
+  color: var(--primary);
+  opacity: 0.6;
+  animation: floatAnim linear infinite;
+}
+.icon.cup { top: 15%; left: 10%; animation-duration: 10s; }
+.icon.croissant { top: 55%; left: 75%; animation-duration: 12s; }
+.icon.walk { top: 35%; left: 60%; animation-duration: 14s; }
+.icon.heart { top: 25%; left: 20%; animation-duration: 11s; }
+.icon.star { top: 65%; left: 80%; animation-duration: 9s; }
+@keyframes floatAnim {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(30px, 30px) rotate(20deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* Intro & Final Screens */
+.intro-screen,
+.final-screen {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.intro-content,
+.final-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 25px;
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px var(--shadow);
+  backdrop-filter: blur(12px);
+  animation: slideUp 0.8s ease;
+  width: 100%;
+  max-width: 550px;
+  border: 2px solid var(--primary);
+}
+.animated-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 2em;
+  margin-bottom: 1em;
+  color: var(--text-main);
+  text-shadow: 0 2px 4px var(--shadow);
+  animation: textPop 1s ease;
+}
+.anecdote-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.2em;
+  color: var(--text-main);
+  margin-bottom: 2em;
+  line-height: 1.5;
+}
+.start-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5em;
+  color: var(--primary);
+  margin-bottom: 1em;
+}
+.btn-large {
+  padding: 14px 35px;
+  font-size: 1.1em;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  box-shadow: 0 6px 20px var(--shadow);
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  width: 100%;
+  margin: 8px 0;
+  font-weight: 500;
+}
+.btn-large:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 30px var(--shadow);
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+}
+
+/* Stage cards */
+.stage {
+  max-width: 550px;
+  margin: 25px auto;
+  padding: 20px;
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px var(--shadow);
+  position: relative;
+  transition: filter 0.5s, transform 0.3s;
+  backdrop-filter: blur(12px);
+  border: 2px solid var(--primary);
+}
+.stage.locked {
+  filter: blur(8px);
+  pointer-events: none;
+}
+.stage h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6em;
+  margin-bottom: 1em;
+  color: var(--text-main);
+  text-align: center;
+  text-shadow: 0 1px 3px var(--shadow);
+}
+
+/* Option display */
+.selected-option {
+  margin: 20px 0;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.5s, transform 0.5s;
+  text-align: center;
+}
+.selected-option.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.selected-option img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px var(--shadow);
+}
+.selected-option p {
+  font-size: 1.2em;
+  margin-top: 12px;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+/* Buttons */
+.random-btn,
+.confirm-btn,
+.retry-btn {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  margin: 10px 5px 0;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  width: 100%;
+  font-size: 1em;
+  font-weight: 500;
+}
+.random-btn:hover,
+.confirm-btn:hover,
+.retry-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 20px var(--shadow);
+}
+.confirm-btn,
+.retry-btn {
+  display: none;
+}
+.confirm-btn.active,
+.retry-btn.active {
+  display: inline-block;
+}
+.confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Global Timer */
+.global-timer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  font-size: 1.2em;
+  color: var(--primary);
+  font-weight: 500;
+  background: var(--card-bg);
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px var(--shadow);
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 1000;
+}
+.global-timer.active {
+  opacity: 1;
+}
+
+/* Progress Bar */
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+.progress-bar .step {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  opacity: 0.4;
+  transition: opacity 0.3s, transform 0.3s;
+}
+.progress-bar .step.completed {
+  opacity: 1;
+  transform: scale(1.2);
+  background: var(--accent);
+}
+
+/* Emoji Rating on Final Screen */
+.final-content .emoji-prompt {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.3em;
+  color: var(--text-main);
+  margin-bottom: 15px;
+}
+.final-content .emoji-rating {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.final-content .emoji-btn {
+  font-size: 2.5em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s, opacity 0.3s;
+}
+.final-content .emoji-btn:hover {
+  transform: scale(1.2);
+  opacity: 0.8;
+}
+.final-content .emoji-btn:active {
+  transform: scale(0.9);
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes textPop {
+  0% { transform: scale(0.8); }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.fade-in {
+  animation: fadeIn 0.6s ease-in;
+}
+.fade-out {
+  animation: fadeOut 0.6s ease-out;
+}
+
+/* Мобільна адаптація */
+@media (max-width: 600px) {
+  .intro-content,
+  .final-content {
+    padding: 15px;
+    max-width: 95%;
+  }
+  .animated-text {
+    font-size: 1.6em;
+  }
+  .anecdote-text {
+    font-size: 1em;
+  }
+  .start-text {
+    font-size: 1.3em;
+  }
+  .btn-large {
+    padding: 12px 20px;
+    font-size: 0.95em;
+  }
+  .stage {
+    margin: 15px 10px;
+    padding: 12px;
+  }
+  .stage h2 {
+    font-size: 1.4em;
+  }
+  .selected-option p {
+    font-size: 1em;
+  }
+  .random-btn,
+  .confirm-btn,
+  .retry-btn {
+    padding: 10px 15px;
+    font-size: 0.9em;
+  }
+  .global-timer {
+    font-size: 1em;
+    padding: 8px 15px;
+  }
+  .progress-bar .step {
+    width: 14px;
+    height: 14px;
+  }
+  .final-content .emoji-prompt {
+    font-size: 1.1em;
+  }
+  .final-content .emoji-btn {
+    font-size: 2em;
+  }
+  .final-content .emoji-rating {
+    gap: 10px;
+  }
+}

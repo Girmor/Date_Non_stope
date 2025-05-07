@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Романтичне побачення - Рандомізатор подій</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Font Awesome для іконок -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Екран привітання 1 -->
+  <section id="intro" class="screen intro-screen fade-in">
+    <div class="intro-bg-anim">
+      <div class="icon cup"><i class="fas fa-coffee"></i></div>
+      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
+      <div class="icon walk"><i class="fas fa-walking"></i></div>
+    </div>
+    <div class="intro-content">
+      <h1 class="animated-text">Привіт, радий тебе бачити. Давай проведемо разом весело час.</h1>
+      <button id="continueBtn" class="btn-large">Продовжити</button>
+    </div>
+  </section>
+
+  <!-- Екран привітання 2 (анекдот) -->
+  <section id="anecdote" class="screen intro-screen" style="display: none;">
+    <div class="intro-bg-anim">
+      <div class="icon cup"><i class="fas fa-coffee"></i></div>
+      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
+      <div class="icon walk"><i class="fas fa-walking"></i></div>
+    </div>
+    <div class="intro-content">
+      <h1 class="animated-text">Щоб трішки тебе звеселити - міні анекдот 😄</h1>
+      <p class="anecdote-text">Намагаючись сказати слово "ксерокс", заїка зібрав біля себе усіх котів району.</p>
+      <p class="start-text">Ну що, почнемо? 🙃</p>
+      <button id="startBtn" class="btn-large">Продовжити</button>
+    </div>
+  </section>
+
+  <!-- Індикатор прогресу -->
+  <div id="progressBar" class="progress-bar"></div>
+
+  <!-- Глобальний таймер -->
+  <div id="globalTimer" class="global-timer"></div>
+
+  <!-- Контейнер для етапів -->
+  <main id="stageContainer" style="display: none;"></main>
+
+  <!-- Фінальний екран -->
+  <section id="final" class="screen final-screen" style="display: none;">
+    <div class="final-bg-anim">
+      <div class="icon heart"><i class="fas fa-heart"></i></div>
+      <div class="icon star"><i class="fas fa-star"></i></div>
+    </div>
+    <div class="final-content">
+      <h1 class="animated-text">Я дуже радий був провести з тобою час 🤪</h1>
+    </div>
+  </section>
+
+  <!-- Бібліотека для конфеті -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
