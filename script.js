@@ -14,7 +14,7 @@ if (!userId) {
 const dateOptions = {
   stages: [
     {
-      question: "Час кави ☕️ : обирай де",
+      question: "Час кави ☕️, обирай де:",
       options: [
         { text: "Parcoffka", image: "images/Kava_ Parcoffka.jpg" },
         { text: "Кав'ярня `Кориця`", image: "images/Kava_koriza.jpg" },
@@ -24,7 +24,7 @@ const dateOptions = {
       icon: "☕"
     },
     {
-      question: "Прогуляємся? Обераай маршрут:",
+      question: "Прогуляємся? Оберай маршрут:",
       options: [
         { text: "Сквер Івана Старова/пл. Сборна", image: "images/Prog_Parg_Starova.jpg" },
         { text: "Парк Шевченка", image: "images/Prog_Park_Shevshenka.jpg" },
@@ -34,7 +34,7 @@ const dateOptions = {
       icon: "🚶"
     },
     {
-      question: "Може щось перекусимо, щось я зголоднів, може сюди:",
+      question: "Щось я зголоднів, врятуєш мене ось тут: ",
       options: [
         { text: "Buon Fratelli", image: "images/Rest_Bioni.jpg" },
         { text: "BROOKS eats & drinks", image: "images/Rest_brooks.jpg" },
@@ -44,7 +44,7 @@ const dateOptions = {
       icon: "🍽️"
     },
     {
-      question: "Може глянемо фільм🎬 ? Давай на цей...",
+      question: "Може глянемо фільм? Давай на цей...",
       options: [
         { text: "Грішники", image: "images/Kino_grishniki.jpeg" },
         { text: "Громовержці", image: "images/Kino_gromovergi.jpg" },
