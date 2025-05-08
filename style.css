@@ -1,5 +1,7 @@
+/* Підключення Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap');
 
+/* Змінні */
 :root {
   --primary: #ff6b81;
   --secondary: #9c27b0;
@@ -10,6 +12,7 @@
   --accent: #ffd700;
 }
 
+/* Скидання базових стилів */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -35,6 +38,7 @@ body {
   overflow: hidden;
   z-index: 1;
 }
+
 .icon {
   position: absolute;
   font-size: 2.5em;
@@ -42,11 +46,13 @@ body {
   opacity: 0.6;
   animation: floatAnim linear infinite;
 }
+
 .icon.cup { top: 15%; left: 10%; animation-duration: 10s; }
 .icon.croissant { top: 55%; left: 75%; animation-duration: 12s; }
 .icon.walk { top: 35%; left: 60%; animation-duration: 14s; }
 .icon.heart { top: 25%; left: 20%; animation-duration: 11s; }
 .icon.star { top: 65%; left: 80%; animation-duration: 9s; }
+
 @keyframes floatAnim {
   0% { transform: translate(0, 0) rotate(0deg); }
   50% { transform: translate(30px, 30px) rotate(20deg); }
@@ -63,6 +69,7 @@ body {
   min-height: 100vh;
   padding: 20px;
 }
+
 .intro-content,
 .final-content {
   position: relative;
@@ -78,6 +85,7 @@ body {
   max-width: 550px;
   border: 2px solid var(--primary);
 }
+
 .animated-text {
   font-family: 'Playfair Display', serif;
   font-size: 2em;
@@ -86,6 +94,7 @@ body {
   text-shadow: 0 2px 4px var(--shadow);
   animation: textPop 1s ease;
 }
+
 .anecdote-text {
   font-family: 'Poppins', sans-serif;
   font-size: 1.2em;
@@ -93,12 +102,14 @@ body {
   margin-bottom: 2em;
   line-height: 1.5;
 }
+
 .start-text {
   font-family: 'Playfair Display', serif;
   font-size: 1.5em;
   color: var(--primary);
   margin-bottom: 1em;
 }
+
 .btn-large {
   padding: 14px 35px;
   font-size: 1.1em;
@@ -113,6 +124,7 @@ body {
   margin: 8px 0;
   font-weight: 500;
 }
+
 .btn-large:hover {
   transform: translateY(-4px) scale(1.05);
   box-shadow: 0 10px 30px var(--shadow);
@@ -132,10 +144,12 @@ body {
   backdrop-filter: blur(12px);
   border: 2px solid var(--primary);
 }
+
 .stage.locked {
   filter: blur(8px);
   pointer-events: none;
 }
+
 .stage h2 {
   font-family: 'Playfair Display', serif;
   font-size: 1.6em;
@@ -153,21 +167,38 @@ body {
   transition: opacity 0.5s, transform 0.5s;
   text-align: center;
 }
+
 .selected-option.visible {
   opacity: 1;
   transform: scale(1);
 }
+
 .selected-option img {
   width: 100%;
   height: auto;
   border-radius: 15px;
   box-shadow: 0 4px 15px var(--shadow);
+  margin-bottom: 12px;
 }
+
 .selected-option p {
-  font-size: 1.2em;
-  margin-top: 12px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4em;
+  font-weight: 700;
   color: var(--text-main);
-  font-weight: 500;
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.9), rgba(255, 245, 238, 0.9));
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 10px var(--shadow);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.selected-option.visible p {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 /* Buttons */
@@ -186,20 +217,24 @@ body {
   font-size: 1em;
   font-weight: 500;
 }
+
 .random-btn:hover,
 .confirm-btn:hover,
 .retry-btn:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 8px 20px var(--shadow);
 }
+
 .confirm-btn,
 .retry-btn {
   display: none;
 }
+
 .confirm-btn.active,
 .retry-btn.active {
   display: inline-block;
 }
+
 .confirm-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -221,6 +256,7 @@ body {
   transition: opacity 0.5s;
   z-index: 1000;
 }
+
 .global-timer.active {
   opacity: 1;
 }
@@ -232,6 +268,7 @@ body {
   gap: 10px;
   margin: 20px 0;
 }
+
 .progress-bar .step {
   width: 18px;
   height: 18px;
@@ -240,6 +277,7 @@ body {
   opacity: 0.4;
   transition: opacity 0.3s, transform 0.3s;
 }
+
 .progress-bar .step.completed {
   opacity: 1;
   transform: scale(1.2);
@@ -253,12 +291,14 @@ body {
   color: var(--text-main);
   margin-bottom: 15px;
 }
+
 .final-content .emoji-rating {
   display: flex;
   justify-content: center;
   gap: 15px;
   flex-wrap: wrap;
 }
+
 .final-content .emoji-btn {
   font-size: 2.5em;
   background: none;
@@ -266,10 +306,12 @@ body {
   cursor: pointer;
   transition: transform 0.3s, opacity 0.3s;
 }
+
 .final-content .emoji-btn:hover {
   transform: scale(1.2);
   opacity: 0.8;
 }
+
 .final-content .emoji-btn:active {
   transform: scale(0.9);
 }
@@ -293,22 +335,27 @@ body {
   from { transform: translateY(30px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
 @keyframes textPop {
   0% { transform: scale(0.8); }
   60% { transform: scale(1.15); }
   100% { transform: scale(1); }
 }
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
 @keyframes fadeOut {
   from { opacity: 1; }
   to { opacity: 0; }
 }
+
 .fade-in {
   animation: fadeIn 0.6s ease-in;
 }
+
 .fade-out {
   animation: fadeOut 0.6s ease-out;
 }
@@ -320,49 +367,67 @@ body {
     padding: 15px;
     max-width: 95%;
   }
+
   .animated-text {
     font-size: 1.6em;
   }
+
   .anecdote-text {
     font-size: 1em;
   }
+
   .start-text {
     font-size: 1.3em;
   }
+
   .btn-large {
     padding: 12px 20px;
     font-size: 0.95em;
   }
+
   .stage {
     margin: 15px 10px;
     padding: 12px;
   }
+
   .stage h2 {
     font-size: 1.4em;
   }
+
   .selected-option p {
-    font-size: 1em;
+    font-size: 1.2em;
+    padding: 8px 15px;
   }
+
+  .selected-option img {
+    max-width: 90%;
+  }
+
   .random-btn,
   .confirm-btn,
   .retry-btn {
     padding: 10px 15px;
     font-size: 0.9em;
   }
+
   .global-timer {
     font-size: 1em;
     padding: 8px 15px;
   }
+
   .progress-bar .step {
     width: 14px;
     height: 14px;
   }
+
   .final-content .emoji-prompt {
     font-size: 1.1em;
   }
+
   .final-content .emoji-btn {
     font-size: 2em;
   }
+
   .final-content .emoji-rating {
     gap: 10px;
   }
