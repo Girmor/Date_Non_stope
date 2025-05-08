@@ -14,7 +14,7 @@ if (!userId) {
 const dateOptions = {
   stages: [
     {
-      question: "Час кави ☕️: Обирай де",
+      question: "Час кави ☕️ : обирай де",
       options: [
         { text: "Parcoffka", image: "images/Kava_ Parcoffka.jpg" },
         { text: "Кав'ярня `Кориця`", image: "images/Kava_koriza.jpg" },
