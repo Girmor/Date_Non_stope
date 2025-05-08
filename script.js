@@ -229,8 +229,8 @@ function setupDOM() {
     let emoji = '';
     if (idx === 0) emoji = '<i class="fas fa-coffee"></i>';
     else if (idx === 1) emoji = '<i class="fas fa-walking"></i>';
-    else if (idx === 2) emoji = '<i class="fas fa-film"></i>';
-    else if (idx === 3) emoji = '<i class="fas fa-utensils"></i>';
+    else if (idx === 2) emoji = '<i class="fas fa-utensils"></i>';
+    else if (idx === 3) emoji = '<i class="fas fa-film"></i>';
     else if (idx === 4) emoji = '<i class="fas fa-gift"></i>';
     const q = document.createElement('h2');
     q.innerHTML = `${emoji} ${stageData.question}`;
