@@ -10,51 +10,55 @@ if (!userId) {
   localStorage.setItem(USER_ID_KEY, userId);
 }
 
-// Конфігурація побачення
+// Конфігурація побачення з власними зображеннями
 const dateOptions = {
   stages: [
     {
-      question: "Де п'ємо каву?",
+      question: "Час кави ☕️: Обирай де",
       options: [
-        { text: "Кав'ярня Арома", image: "https://picsum.photos/seed/coffee1/400/300" },
-        { text: "Cafe de Paris", image: "https://picsum.photos/seed/coffee2/400/300" },
-        { text: "Starbucks", image: "https://picsum.photos/seed/coffee3/400/300" }
+        { text: "Parcoffka", image: "images/Kava_ Parcoffka.jpg" },
+        { text: "Кав'ярня `Кориця`", image: "images/Kava_koriza.jpg" },
+        { text: "Бар `HIWAY`", image: "images/Kava_near_bik.jpg" },
+        { text: "Вільна зона", image: "images/Kava_vilna_zona.jpg" }
       ],
       icon: "☕"
     },
     {
-      question: "Прогуляємся? а саме сюди:",
+      question: "Прогуляємся? Обераай маршрут:",
       options: [
-        { text: "Центральний парк", image: "https://picsum.photos/seed/park1/400/300" },
-        { text: "Набережна річки", image: "https://picsum.photos/seed/river/400/300" },
-        { text: "Старе місто", image: "https://picsum.photos/seed/oldtown/400/300" }
+        { text: "Сквер Івана Старова/пл. Сборна", image: "images/Prog_Parg_Starova.jpg" },
+        { text: "Парк Шевченка", image: "images/Prog_Park_Shevshenka.jpg" },
+        { text: "Яхт-клуб `Січ`", image: "images/Prog_yaht.jpg" },
+        { text: "Парк Зелений Гай/«Динопарк»", image: "images/Prog_Zelen_dynopark.jpg" }
       ],
       icon: "🚶"
     },
     {
-      question: "Будемо йти на фільм? давай на цей...",
+      question: "Може щось перекусимо, щось я зголоднів, може сюди:",
       options: [
-        { text: "Романтична комедія", image: "https://picsum.photos/seed/movie1/400/300" },
-        { text: "Фантастичний екшн", image: "https://picsum.photos/seed/movie2/400/300" },
-        { text: "Драма", image: "https://picsum.photos/seed/movie3/400/300" }
-      ],
-      icon: "🎬"
-    },
-    {
-      question: "Де вечеряємо?",
-      options: [
-        { text: "Італійський ресторан", image: "https://picsum.photos/seed/dinner1/400/300" },
-        { text: "Японське бістро", image: "https://picsum.photos/seed/dinner2/400/300" },
-        { text: "Домашня піца", image: "https://picsum.photos/seed/dinner3/400/300" }
+        { text: "Buon Fratelli", image: "images/Rest_Bioni.jpg" },
+        { text: "BROOKS eats & drinks", image: "images/Rest_brooks.jpg" },
+        { text: "Buon Fratelli", image: "images/Rest_flipneo.jpg" },
+        { text: "Giannivino", image: "images/Rest_Giannivino.jpg" }
       ],
       icon: "🍽️"
     },
     {
-      question: "Тепер за твоє 'терпіння' - давай виберемо тобі міні подарунок.",
+      question: "Може глянемо фільм🎬 ? Давай на цей...",
       options: [
-        { text: "Квітка", image: "https://picsum.photos/seed/flower/400/300" },
-        { text: "Шоколадка", image: "https://picsum.photos/seed/chocolate/400/300" },
-        { text: "Брелок", image: "https://picsum.photos/seed/keychain/400/300" }
+        { text: "Грішники", image: "images/Kino_grishniki.jpeg" },
+        { text: "Громовержці", image: "images/Kino_gromovergi.jpg" },
+        { text: "MINECRAFT", image: "images/Kino_minecrafte.jpg" }
+      ],
+      icon: "🎬"
+    },
+    {
+      question: "Тепер за твоє 'терпіння' 🙂 - вибери міні подарунок!",
+      options: [
+        { text: "Квіти", image: "images/Podarik_kviti.jpg" },
+        { text: "Рафаелки", image: "images/Podarik_rafaelo.jpeg" },
+        { text: "Брелок", image: "images/Podarik_brelok.jpg" },
+        { text: "Міні іграшка", image: "images/Podarik_snish.jpeg" },
       ],
       icon: "🎁"
     }
@@ -503,6 +507,9 @@ function spinEffect(idx, img, name, display, confBtn, retryBtn) {
     const i = count % opts.length;
     const o = opts[i];
     img.src = o.image;
+    img.onerror = () => {
+      console.error(`Failed to load image: ${o.image}`);
+    };
     name.textContent = o.text;
     display.classList.add('visible');
     count++;
@@ -511,6 +518,9 @@ function spinEffect(idx, img, name, display, confBtn, retryBtn) {
       const chosen = Math.floor(Math.random() * opts.length);
       const co = opts[chosen];
       img.src = co.image;
+      img.onerror = () => {
+        console.error(`Failed to load image: ${co.image}`);
+      };
       name.textContent = co.text;
       state.stages[idx].selectedIndex = chosen;
       saveState();
@@ -597,6 +607,9 @@ function unlockStage(i) {
           const name = display.querySelector('p');
           if (img && name) {
             img.src = opt.image;
+            img.onerror = () => {
+              console.error(`Failed to load image: ${opt.image}`);
+            };
             name.textContent = opt.text;
             display.classList.add('visible');
             confBtn.classList.add('active');
@@ -610,6 +623,9 @@ function unlockStage(i) {
         const name = display.querySelector('p');
         if (img && name) {
           img.src = opt.image;
+          img.onerror = () => {
+            console.error(`Failed to load image: ${opt.image}`);
+          };
           name.textContent = opt.text;
           display.classList.add('visible');
         }
@@ -710,9 +726,9 @@ function generateRoadmap() {
   const ctx = canvas.getContext('2d');
 
   // Розміри canvas
-  const stageHeight = 200; // Висота одного етапу
+  const stageHeight = 200;
   const canvasWidth = 600;
-  const canvasHeight = (dateOptions.stages.length * stageHeight) + 100; // +100 для дати та відступів
+  const canvasHeight = (dateOptions.stages.length * stageHeight) + 100;
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
 
@@ -726,8 +742,8 @@ function generateRoadmap() {
   // Додаємо дату зверху
   ctx.font = 'bold 24px Poppins';
   ctx.fillStyle = '#2d1b3e';
-  const today = new Date('2025-05-07'); // Статична дата, як у вашому запиті
-  const dateText = `Історія одноо дня ${today.toLocaleDateString('uk-UA')}`;
+  const today = new Date('2025-05-11');
+  const dateText = `Історія одного дня ${today.toLocaleDateString('uk-UA')}`;
   const dateTextWidth = ctx.measureText(dateText).width;
   ctx.fillText(dateText, (canvasWidth - dateTextWidth) / 2, 40);
 
@@ -743,6 +759,10 @@ function generateRoadmap() {
   ctx.strokeStyle = '#ff6b81';
   ctx.lineWidth = pathWidth;
   ctx.stroke();
+
+  // Лічильник завантажених зображень
+  let loadedImages = 0;
+  const totalStages = dateOptions.stages.filter((_, idx) => state.stages[idx].confirmed && state.stages[idx].selectedIndex !== null).length;
 
   // Додаємо етапи
   dateOptions.stages.forEach((stage, idx) => {
@@ -766,31 +786,60 @@ function generateRoadmap() {
     ctx.fillStyle = '#2d1b3e';
     ctx.fillText(stage.icon, pathX - 10, stageY + 58);
 
-    // Текст етапу
-    ctx.font = 'bold 16px Poppins';
+    // Текст етапу з фоном
     const stageText = `${stage.question} ${selectedOption.text}`;
+    ctx.font = 'bold 18px "Playfair Display"';
+    ctx.textAlign = 'center';
     const textWidth = ctx.measureText(stageText).width;
-    ctx.fillText(stageText, (canvasWidth - textWidth) / 2, stageY + 90);
+    const textX = canvasWidth / 2;
+    const textY = stageY + 90;
+    const padding = 10;
+    const bgWidth = textWidth + padding * 2;
+    const bgHeight = 30;
+
+    // Напівпрозорий градієнтний фон
+    const textGradient = ctx.createLinearGradient(textX - bgWidth / 2, 0, textX + bgWidth / 2, 0);
+    textGradient.addColorStop(0, 'rgba(255, 182, 193, 0.9)');
+    textGradient.addColorStop(1, 'rgba(255, 245, 238, 0.9)');
+    ctx.fillStyle = textGradient;
+    ctx.beginPath();
+    ctx.roundRect(textX - bgWidth / 2, textY - bgHeight / 2, bgWidth, bgHeight, 12);
+    ctx.fill();
+
+    // Золота рамка
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Текст із тінню
+    ctx.fillStyle = '#2d1b3e';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+    ctx.fillText(stageText, textX, textY + 6);
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
 
     // Зображення етапу
     const img = new Image();
-    img.crossOrigin = "Anonymous"; // Для завантаження зображень з іншого домену
     img.src = selectedOption.image;
     img.onload = () => {
       const imgWidth = 100;
       const imgHeight = 75;
       ctx.drawImage(img, (canvasWidth - imgWidth) / 2, stageY + 110, imgWidth, imgHeight);
-
-      // Після завантаження всіх зображень показуємо кнопку завантаження
-      if (idx === dateOptions.stages.length - 1) {
+      loadedImages++;
+      if (loadedImages === totalStages) {
         roadmapContainer.appendChild(canvas);
         downloadBtn.style.display = 'inline-block';
       }
     };
     img.onerror = () => {
       console.error(`Failed to load image for stage ${idx}: ${selectedOption.image}`);
-      // У разі помилки завантаження зображення все одно показуємо кнопку
-      if (idx === dateOptions.stages.length - 1) {
+      loadedImages++;
+      if (loadedImages === totalStages) {
         roadmapContainer.appendChild(canvas);
         downloadBtn.style.display = 'inline-block';
       }
@@ -799,10 +848,15 @@ function generateRoadmap() {
 
   // Обробник для завантаження роудмепу
   downloadBtn.addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.download = 'our-day-roadmap.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    try {
+      const link = document.createElement('a');
+      link.download = 'our-day-roadmap.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (e) {
+      console.error('Failed to download roadmap:', e);
+      alert('Не вдалося завантажити роудмеп. Переконайтеся, що всі зображення доступні в папці images і сайт відкритий через локальний сервер.');
+    }
   });
 }
 
