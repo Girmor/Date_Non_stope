@@ -26,7 +26,7 @@ const dateOptions = {
     {
       question: "Прогуляємся? Оберай маршрут:",
       options: [
-        { text: "Сквер Івана Старова/пл. Сборна", image: "images/Prog_Parg_Starova.jpg" },
+        { text: "Сквер Івана Старова/пл. Соборна", image: "images/Prog_Parg_Starova.jpg" },
         { text: "Парк Шевченка", image: "images/Prog_Park_Shevshenka.jpg" },
         { text: "Яхт-клуб `Січ`", image: "images/Prog_yaht.jpg" },
         { text: "Парк Зелений Гай/«Динопарк»", image: "images/Prog_Zelen_dynopark.jpg" }
