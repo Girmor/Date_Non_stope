@@ -384,17 +384,20 @@ body {
   z-index: var(--z-content);
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-slow);
+  pointer-events: none;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
 }
 
 .screen.active {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .screen.fade-out {
   opacity: 0;
-  transform: scale(0.95);
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Floating Icons */
