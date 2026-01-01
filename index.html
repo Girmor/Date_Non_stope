@@ -1,115 +1,225 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Рандомізатор подій</title>
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap"
-    rel="stylesheet"
-  />
-  <!-- Font Awesome для іконок -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Інтерактивний рандомізатор подій для незабутнього побачення">
+  <meta name="theme-color" content="#ff6b81">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <title>✨ Рандомізатор подій</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Екран привітання 1 -->
-  <section id="intro" class="screen intro-screen fade-in">
-    <div class="intro-bg-anim">
-      <div class="icon cup"><i class="fas fa-coffee"></i></div>
-      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
-      <div class="icon walk"><i class="fas fa-walking"></i></div>
+  <!-- Particles Background -->
+  <div id="particles" class="particles-container" aria-hidden="true"></div>
+  
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="theme-toggle" aria-label="Перемкнути тему">
+    <i class="fas fa-moon"></i>
+    <i class="fas fa-sun"></i>
+  </button>
+
+  <!-- Sound Toggle -->
+  <button id="soundToggle" class="sound-toggle" aria-label="Увімкнути/вимкнути звук">
+    <i class="fas fa-volume-up"></i>
+    <i class="fas fa-volume-mute"></i>
+  </button>
+
+  <!-- Progress Indicator -->
+  <nav id="progressBar" class="progress-bar" aria-label="Прогрес">
+    <div class="progress-line"></div>
+  </nav>
+
+  <!-- Global Timer -->
+  <aside id="globalTimer" class="global-timer" role="timer" aria-live="polite">
+    <i class="fas fa-hourglass-half"></i>
+    <span class="timer-text"></span>
+  </aside>
+
+  <!-- Intro Screens -->
+  <section id="intro-1" class="screen intro-screen active" data-step="intro-1">
+    <div class="floating-icons" aria-hidden="true">
+      <span class="float-icon">☕</span>
+      <span class="float-icon">🥐</span>
+      <span class="float-icon">🚶</span>
+      <span class="float-icon">💫</span>
+      <span class="float-icon">🎬</span>
     </div>
-    <div class="intro-content">
-      <h1 class="animated-text">Привіт, радий тебе бачити 😊. Давай проведемо разом весело час.</h1>
-      <button id="continueBtn" class="btn-large">Продовжити</button>
-    </div>
+    <article class="card glass-card">
+      <div class="card-glow"></div>
+      <h1 class="title-fancy">
+        <span class="title-line">Привіт!</span>
+        <span class="title-emoji">😊</span>
+      </h1>
+      <p class="subtitle">Радий тебе бачити. Давай проведемо разом весело час.</p>
+      <button class="btn btn-primary btn-glow" data-next="intro-2">
+        <span>Продовжити</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </article>
   </section>
 
-  <!-- Екран привітання 2 (анекдот) -->
-  <section id="anecdote" class="screen intro-screen" style="display: none;">
-    <div class="intro-bg-anim">
-      <div class="icon cup"><i class="fas fa-coffee"></i></div>
-      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
-      <div class="icon walk"><i class="fas fa-walking"></i></div>
+  <section id="intro-2" class="screen intro-screen" data-step="intro-2">
+    <div class="floating-icons" aria-hidden="true">
+      <span class="float-icon">😄</span>
+      <span class="float-icon">🤣</span>
+      <span class="float-icon">😸</span>
     </div>
-    <div class="intro-content">
-      <h1 class="animated-text">Щоб трішки тебе звеселити - міні анекдот 😄</h1>
-      <p class="anecdote-text">Намагаючись сказати слово "ксерокс", заїка зібрав біля себе усіх котів району.</p>
-      <p class="start-text">Ну що, почнемо? 🙃</p>
-      <button id="startBtn" class="btn-large">Продовжити</button>
-    </div>
+    <article class="card glass-card">
+      <div class="card-glow"></div>
+      <div class="joke-badge">
+        <i class="fas fa-laugh-squint"></i>
+        <span>Міні-анекдот</span>
+      </div>
+      <p class="joke-text">
+        "Намагаючись сказати слово <strong>«ксерокс»</strong>, заїка зібрав біля себе усіх котів району."
+      </p>
+      <p class="subtitle">Ну що, почнемо? 🙃</p>
+      <button class="btn btn-primary btn-glow" data-next="intro-3">
+        <span>Продовжити</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </article>
   </section>
 
-  <!-- Екран привітання 3 (Загадковість) -->
-  <section id="mystery" class="screen intro-screen" style="display: none;">
-    <div class="intro-bg-anim">
-      <div class="icon cup"><i class="fas fa-coffee"></i></div>
-      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
-      <div class="icon walk"><i class="fas fa-walking"></i></div>
+  <section id="intro-3" class="screen intro-screen" data-step="intro-3">
+    <div class="floating-icons" aria-hidden="true">
+      <span class="float-icon">✨</span>
+      <span class="float-icon">🎲</span>
+      <span class="float-icon">🔮</span>
+      <span class="float-icon">💫</span>
     </div>
-    <div class="intro-content">
-      <h1 class="animated-text">✨ Давай додамо трішки загадковості й випадковості нашій зустрічі! 🎲</h1>
-      <p class="anecdote-text">Ти будеш обирати події, локації або заходи, натискаючи кнопку «Обрати», після чого випадковим чином відкриється цікава ідея для нашої зустрічі! 💫</p>
-      <button id="mysteryBtn" class="btn-large">Продовжити</button>
-    </div>
+    <article class="card glass-card">
+      <div class="card-glow"></div>
+      <h1 class="title-fancy">
+        <span class="title-line">Загадковість</span>
+        <span class="title-emoji">🎲</span>
+      </h1>
+      <p class="description">
+        Ти будеш обирати події, локації або заходи, натискаючи кнопку <strong>«Обрати»</strong>, 
+        після чого випадковим чином відкриється цікава ідея для нашої зустрічі!
+      </p>
+      <button class="btn btn-primary btn-glow" data-next="intro-4">
+        <span>Продовжити</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </article>
   </section>
 
-  <!-- Екран привітання 4 (Заморожені події) -->
-  <section id="lockedEvents" class="screen intro-screen" style="display: none;">
-    <div class="intro-bg-anim">
-      <div class="icon cup"><i class="fas fa-coffee"></i></div>
-      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
-      <div class="icon walk"><i class="fas fa-walking"></i></div>
+  <section id="intro-4" class="screen intro-screen" data-step="intro-4">
+    <div class="floating-icons" aria-hidden="true">
+      <span class="float-icon">🔒</span>
+      <span class="float-icon">⏰</span>
+      <span class="float-icon">🤫</span>
     </div>
-    <div class="intro-content">
-      <p class="anecdote-text">🔒 Кожна наступна подія буде тимчасово «заморожена» і залишатиметься секретом 🤫. Щоб її розблокувати, потрібно провести хоча б 15 хвилин на попередній локації.</p>
-      <button id="lockedEventsBtn" class="btn-large">Продовжити</button>
-    </div>
+    <article class="card glass-card">
+      <div class="card-glow"></div>
+      <div class="lock-icon-container">
+        <i class="fas fa-lock lock-icon"></i>
+      </div>
+      <p class="description">
+        Кожна наступна подія буде тимчасово <strong>«заморожена»</strong> і залишатиметься секретом 🤫. 
+        Щоб її розблокувати, потрібно провести хоча б <strong>15 хвилин</strong> на попередній локації.
+      </p>
+      <button class="btn btn-primary btn-glow" data-next="intro-5">
+        <span>Продовжити</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </article>
   </section>
 
-  <!-- Екран привітання 5 (Останній перед початком) -->
-  <section id="funPromise" class="screen intro-screen" style="display: none;">
-    <div class="intro-bg-anim">
-      <div class="icon cup"><i class="fas fa-coffee"></i></div>
-      <div class="icon croissant"><i class="fas fa-croissant"></i></div>
-      <div class="icon walk"><i class="fas fa-walking"></i></div>
+  <section id="intro-5" class="screen intro-screen" data-step="intro-5">
+    <div class="floating-icons" aria-hidden="true">
+      <span class="float-icon">🎉</span>
+      <span class="float-icon">🚀</span>
+      <span class="float-icon">💖</span>
+      <span class="float-icon">🌟</span>
     </div>
-    <div class="intro-content">
-      <h1 class="animated-text">Не хвилюйся — довго мучити тебе не буду 😇</h1>
-      <p class="anecdote-text">але обіцяю: буде весело, цікаво та трохи непередбачувано! 😏🎉</p>
-      <button id="beginBtn" class="btn-large">Почнемо 🚀</button>
-    </div>
+    <article class="card glass-card">
+      <div class="card-glow"></div>
+      <h1 class="title-fancy">
+        <span class="title-line">Готові?</span>
+        <span class="title-emoji">😇</span>
+      </h1>
+      <p class="description">
+        Не хвилюйся — довго мучити тебе не буду, але обіцяю: буде <strong>весело</strong>, 
+        <strong>цікаво</strong> та трохи <strong>непередбачувано</strong>! 😏🎉
+      </p>
+      <button class="btn btn-primary btn-glow btn-start" data-next="stages">
+        <span>Почнемо</span>
+        <i class="fas fa-rocket"></i>
+      </button>
+    </article>
   </section>
 
-  <!-- Індикатор прогресу -->
-  <div id="progressBar" class="progress-bar"></div>
+  <!-- Stages Container -->
+  <main id="stagesContainer" class="stages-container">
+    <!-- Stages will be dynamically generated -->
+  </main>
 
-  <!-- Глобальний таймер -->
-  <div id="globalTimer" class="global-timer"></div>
-
-  <!-- Контейнер для етапів -->
-  <main id="stageContainer" style="display: none;"></main>
-
-  <!-- Фінальний екран -->
-  <section id="final" class="screen final-screen" style="display: none;">
-    <div class="final-bg-anim">
-      <div class="icon heart"><i class="fas fa-heart"></i></div>
-      <div class="icon star"><i class="fas fa-star"></i></div>
+  <!-- Final Screen -->
+  <section id="final" class="screen final-screen" data-step="final">
+    <div class="floating-icons celebration" aria-hidden="true">
+      <span class="float-icon">💖</span>
+      <span class="float-icon">⭐</span>
+      <span class="float-icon">🎊</span>
+      <span class="float-icon">✨</span>
+      <span class="float-icon">💫</span>
+      <span class="float-icon">🌟</span>
     </div>
-    <div class="final-content">
-      <h1 class="animated-text">Я дуже радий був провести з тобою час 🤪</h1>
-      <!-- Додаємо контейнер для роудмепу -->
-      <div id="roadmapContainer" style="text-align: center; margin: 20px 0;"></div>
-      <button id="downloadRoadmapBtn" class="btn-large" style="display: none;">Завантажити роудмеп дня</button>
-    </div>
+    <article class="card glass-card final-card">
+      <div class="card-glow"></div>
+      <h1 class="title-fancy celebration-title">
+        <span class="title-line">Дякую!</span>
+        <span class="title-emoji">🤗</span>
+      </h1>
+      <p class="subtitle">Я дуже радий був провести з тобою час!</p>
+      
+      <!-- Roadmap Container -->
+      <div id="roadmapContainer" class="roadmap-container"></div>
+      
+      <!-- Emoji Rating -->
+      <div class="rating-section">
+        <p class="rating-prompt">Оціни цей день:</p>
+        <div class="emoji-rating" role="group" aria-label="Оцінка дня">
+          <button class="emoji-btn" data-rating="inlove" aria-label="Закохано">😍</button>
+          <button class="emoji-btn" data-rating="laughing" aria-label="Дуже весело">😂</button>
+          <button class="emoji-btn" data-rating="happy" aria-label="Добре">😊</button>
+          <button class="emoji-btn" data-rating="neutral" aria-label="Нормально">😐</button>
+          <button class="emoji-btn" data-rating="speechless" aria-label="Без слів">😶</button>
+          <button class="emoji-btn" data-rating="sad" aria-label="Сумно">😢</button>
+        </div>
+      </div>
+      
+      <button id="downloadRoadmap" class="btn btn-secondary">
+        <i class="fas fa-download"></i>
+        <span>Завантажити роудмеп</span>
+      </button>
+    </article>
   </section>
 
-  <!-- Бібліотека для конфеті -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="script.js" defer></script>
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  
+  <!-- Main Script -->
+  <script src="script.js" type="module"></script>
 </body>
 </html>
