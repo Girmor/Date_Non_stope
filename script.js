@@ -915,47 +915,57 @@ class DateRandomizerApp {
   }
 
   async init() {
-    console.log('Initializing Date Randomizer App...');
+    console.log('🚀 Initializing Date Randomizer App...');
     
-    // Initialize managers
-    this.stateManager.load();
-    this.soundManager.init();
-    this.themeManager.init();
+    try {
+      // Initialize managers
+      this.stateManager.load();
+      this.soundManager.init();
+      this.themeManager.init();
+      console.log('✅ Managers initialized');
 
-    // Initialize particles
-    const particlesContainer = Utils.$('#particles');
-    if (particlesContainer) {
-      this.particles = new ParticlesEffect(particlesContainer);
-      this.particles.init();
+      // Initialize particles
+      const particlesContainer = Utils.$('#particles');
+      if (particlesContainer) {
+        this.particles = new ParticlesEffect(particlesContainer);
+        this.particles.init();
+        console.log('✅ Particles initialized');
+      }
+
+      // Initialize progress bar
+      const progressBarElement = Utils.$('#progressBar');
+      if (progressBarElement) {
+        this.progressBar = new ProgressBar(progressBarElement, DATE_OPTIONS.stages.length);
+        this.progressBar.init();
+        console.log('✅ Progress bar initialized');
+      }
+
+      // Initialize timer
+      const timerElement = Utils.$('#globalTimer');
+      if (timerElement) {
+        this.timer = new Timer(timerElement);
+        console.log('✅ Timer initialized');
+      }
+
+      // Initialize roadmap generator
+      this.roadmapGenerator = new RoadmapGenerator(DATE_OPTIONS.stages, this.stateManager);
+
+      // Setup UI
+      this.setupThemeToggle();
+      this.setupSoundToggle();
+      this.setupIntroNavigation();
+      this.setupStages();
+      this.setupFinalScreen();
+      console.log('✅ UI setup complete');
+
+      // Restore state
+      this.restoreState();
+      console.log('✅ State restored');
+
+      console.log('🎉 App initialized successfully!');
+    } catch (error) {
+      console.error('❌ Error during initialization:', error);
     }
-
-    // Initialize progress bar
-    const progressBarElement = Utils.$('#progressBar');
-    if (progressBarElement) {
-      this.progressBar = new ProgressBar(progressBarElement, DATE_OPTIONS.stages.length);
-      this.progressBar.init();
-    }
-
-    // Initialize timer
-    const timerElement = Utils.$('#globalTimer');
-    if (timerElement) {
-      this.timer = new Timer(timerElement);
-    }
-
-    // Initialize roadmap generator
-    this.roadmapGenerator = new RoadmapGenerator(DATE_OPTIONS.stages, this.stateManager);
-
-    // Setup UI
-    this.setupThemeToggle();
-    this.setupSoundToggle();
-    this.setupIntroNavigation();
-    this.setupStages();
-    this.setupFinalScreen();
-
-    // Restore state
-    this.restoreState();
-
-    console.log('App initialized successfully');
   }
 
   setupThemeToggle() {
@@ -987,9 +997,16 @@ class DateRandomizerApp {
   setupIntroNavigation() {
     const buttons = Utils.$$('[data-next]');
     
+    console.log('Setting up intro navigation, found buttons:', buttons.length);
+    
     buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const nextStep = btn.dataset.next;
+      const nextStep = btn.dataset.next;
+      console.log('Button found with data-next:', nextStep);
+      
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Button clicked, navigating to:', nextStep);
+        
         this.soundManager.playClick();
         Utils.vibrate(50);
         
@@ -1006,19 +1023,25 @@ class DateRandomizerApp {
     const currentScreen = Utils.$('.screen.active');
     const nextScreen = Utils.$(`#${screenId}`);
 
-    if (!nextScreen) return;
+    console.log('Navigating to:', screenId, 'Next screen found:', !!nextScreen);
 
-    if (currentScreen) {
+    if (!nextScreen) {
+      console.error('Screen not found:', screenId);
+      return;
+    }
+
+    if (currentScreen && currentScreen !== nextScreen) {
       currentScreen.classList.add('fade-out');
       setTimeout(() => {
         currentScreen.classList.remove('active', 'fade-out');
-      }, 500);
+      }, 400);
     }
 
     setTimeout(() => {
       nextScreen.classList.add('active');
       this.stateManager.update({ currentStep: screenId });
-    }, currentScreen ? 300 : 0);
+      console.log('Screen activated:', screenId);
+    }, currentScreen && currentScreen !== nextScreen ? 250 : 0);
   }
 
   setupStages() {
@@ -1213,12 +1236,14 @@ class DateRandomizerApp {
 
     // If farewell reached, show final screen
     if (state.farewellReached && this.stateManager.areAllStagesConfirmed()) {
+      console.log('Showing final screen');
       this.showFinalScreen();
       return;
     }
 
     // If intro completed, show stages
     if (state.introCompleted) {
+      console.log('Intro completed, showing stages');
       Utils.$$('.intro-screen').forEach(screen => {
         screen.classList.remove('active');
       });
@@ -1274,9 +1299,15 @@ class DateRandomizerApp {
       return;
     }
 
-    // Show appropriate intro screen
-    const currentStep = state.currentStep || 'intro-1';
-    this.navigateToScreen(currentStep);
+    // First time - just show intro-1 (it's already active in HTML)
+    // Don't call navigateToScreen here as it's already visible
+    console.log('First visit or intro not completed, showing intro-1');
+    
+    // Make sure intro-1 is active
+    const intro1 = Utils.$('#intro-1');
+    if (intro1 && !intro1.classList.contains('active')) {
+      intro1.classList.add('active');
+    }
   }
 }
 
