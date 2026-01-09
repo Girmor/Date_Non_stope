@@ -773,7 +773,181 @@ class Timer {
 }
 
 // ============================================
-// STAGE COMPONENT
+// GRID STAGE COMPONENT (Новий дизайн з сіткою)
+// ============================================
+
+class GridStageComponent {
+  constructor(stageData, index, options = {}) {
+    this.data = stageData;
+    this.index = index;
+    this.options = options;
+    this.element = null;
+    this.selectedIndex = null;
+  }
+
+  render() {
+    const stage = document.createElement('section');
+    stage.className = 'stage-card glass-card locked grid-mode';
+    stage.dataset.index = this.index;
+    stage.id = `stage-${this.index}`;
+
+    stage.innerHTML = `
+      <div class="card-glow"></div>
+
+      <header class="stage-header modern">
+        <div class="stage-icon-wrapper">
+          <div class="stage-icon modern">
+            <i class="fas ${this.data.icon}"></i>
+          </div>
+          <span class="stage-emoji-large">${this.data.emoji}</span>
+        </div>
+        <div class="stage-title-wrapper">
+          <h2 class="stage-title modern">${this.data.question}</h2>
+          <p class="stage-subtitle">Обери один варіант:</p>
+        </div>
+      </header>
+
+      <div class="stage-content grid-content">
+        <div class="options-grid">
+          ${this.renderOptionsGrid()}
+        </div>
+
+        <div class="stage-actions modern">
+          <button class="btn btn-confirm-modern" disabled>
+            <i class="fas fa-check-circle"></i>
+            <span>Підтвердити вибір</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="stage-lock-overlay">
+        <i class="fas fa-lock"></i>
+        <p>Очікування...</p>
+      </div>
+    `;
+
+    this.element = stage;
+    this.bindEvents();
+    return stage;
+  }
+
+  renderOptionsGrid() {
+    return this.data.options.map((option, index) => `
+      <div class="option-card" data-index="${index}">
+        <div class="option-card-inner">
+          <div class="option-image-wrapper">
+            <img src="${option.image}" alt="${option.text}" class="option-image">
+            <div class="option-overlay">
+              <i class="fas fa-check-circle option-check"></i>
+            </div>
+          </div>
+          <div class="option-info">
+            <h3 class="option-title">${option.text}</h3>
+            <div class="option-badge">
+              <i class="fas fa-heart"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  bindEvents() {
+    const optionCards = this.element.querySelectorAll('.option-card');
+    const confirmBtn = this.element.querySelector('.btn-confirm-modern');
+
+    optionCards.forEach((card, index) => {
+      card.addEventListener('click', () => {
+        if (this.element.classList.contains('locked')) return;
+
+        this.selectOption(index);
+        this.options.soundManager?.playClick();
+        Utils.vibrate(50);
+      });
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      if (this.selectedIndex !== null) {
+        this.confirm();
+      }
+    });
+  }
+
+  selectOption(index) {
+    this.selectedIndex = index;
+
+    // Remove selection from all cards
+    const cards = this.element.querySelectorAll('.option-card');
+    cards.forEach(card => card.classList.remove('selected'));
+
+    // Add selection to clicked card
+    cards[index].classList.add('selected');
+
+    // Enable confirm button
+    const confirmBtn = this.element.querySelector('.btn-confirm-modern');
+    confirmBtn.disabled = false;
+
+    // Save to state
+    if (this.options.onSpin) {
+      this.options.onSpin(this.index, index);
+    }
+  }
+
+  confirm() {
+    const { onConfirm, soundManager } = this.options;
+
+    this.element.classList.add('confirmed');
+    soundManager?.playSuccess();
+    Utils.vibrate([100, 50, 100]);
+
+    // Trigger confetti
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 150,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#ff6b81', '#ffd700', '#9c27b0', '#ff9ff3']
+      });
+    }
+
+    if (onConfirm) {
+      onConfirm(this.index);
+    }
+  }
+
+  unlock() {
+    this.element.classList.remove('locked');
+    this.element.classList.add('unlocked');
+
+    // Animate cards appearing
+    const cards = this.element.querySelectorAll('.option-card');
+    cards.forEach((card, index) => {
+      setTimeout(() => {
+        card.classList.add('appear');
+      }, index * 100);
+    });
+
+    this.options.soundManager?.playUnlock();
+  }
+
+  lock() {
+    this.element.classList.add('locked');
+    this.element.classList.remove('unlocked');
+  }
+
+  setSelected(selectedIndex) {
+    if (selectedIndex !== null) {
+      this.selectOption(selectedIndex);
+    }
+  }
+
+  isLocked() {
+    return this.element?.classList.contains('locked') ?? true;
+  }
+}
+
+// ============================================
+// STAGE COMPONENT (Old design - kept for reference)
 // ============================================
 
 class StageComponent {
@@ -799,7 +973,7 @@ class StageComponent {
         </div>
         <h2 class="stage-title">${this.data.question}</h2>
       </header>
-      
+
       <div class="stage-content">
         <div class="option-display">
           <div class="option-image-container">
@@ -808,13 +982,13 @@ class StageComponent {
           </div>
           <p class="option-name"></p>
         </div>
-        
+
         <div class="stage-actions">
           <button class="btn btn-primary btn-spin">
             <i class="fas fa-dice"></i>
             <span>Обрати варіант</span>
           </button>
-          
+
           <div class="confirm-actions">
             <button class="btn btn-success btn-confirm">
               <i class="fas fa-check"></i>
@@ -827,7 +1001,7 @@ class StageComponent {
           </div>
         </div>
       </div>
-      
+
       <div class="stage-lock-overlay">
         <i class="fas fa-lock"></i>
         <p>Очікування...</p>
@@ -1463,16 +1637,16 @@ class DateRandomizerApp {
     if (!container) return;
 
     DATE_OPTIONS.stages.forEach((stageData, index) => {
-      const component = new StageComponent(stageData, index, {
+      const component = new GridStageComponent(stageData, index, {
         soundManager: this.soundManager,
         onSpin: (idx, selectedIndex) => {
           this.stateManager.updateStage(idx, { selectedIndex });
         },
         onConfirm: (idx) => this.handleStageConfirm(idx),
         onRetry: (idx) => {
-          this.stateManager.updateStage(idx, { 
-            selectedIndex: null, 
-            confirmed: false 
+          this.stateManager.updateStage(idx, {
+            selectedIndex: null,
+            confirmed: false
           });
         }
       });
