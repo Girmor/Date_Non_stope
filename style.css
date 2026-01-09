@@ -409,6 +409,7 @@ body {
   height: 100%;
   pointer-events: none;
   overflow: hidden;
+  z-index: 1;
 }
 
 .float-icon {
@@ -499,6 +500,8 @@ body {
   padding: var(--space-xl);
   text-align: center;
   animation: card-appear 0.8s ease backwards;
+  position: relative;
+  z-index: 10;
 }
 
 @keyframes card-appear {
@@ -734,6 +737,8 @@ body {
   padding: var(--space-lg);
   transition: all var(--transition-normal);
   animation: stage-appear 0.6s ease backwards;
+  position: relative;
+  z-index: 10;
 }
 
 .stage-card:nth-child(1) { animation-delay: 0.1s; }
@@ -942,6 +947,8 @@ body {
   width: 100%;
   padding: var(--space-xl);
   text-align: center;
+  position: relative;
+  z-index: 10;
 }
 
 .final-card {
