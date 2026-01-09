@@ -8,7 +8,7 @@
 // ============================================
 
 const CONFIG = {
-  DELAY_MS: 30 * 1000, // 30 секунд для тестування (змініть на 15 * 60 * 1000 для 15 хвилин)
+  DELAY_MS: 5 * 1000, // 5 секунд для тестування (змініть на 15 * 60 * 1000 для 15 хвилин)
   STORAGE_KEY: 'dateRandomizerState_v2',
   USER_ID_KEY: 'dateRandomizerUserId',
   SPIN_DURATION: 2500,
@@ -203,9 +203,122 @@ class SoundManager {
 // THEME MANAGER
 // ============================================
 
+const THEMES = {
+  light: {
+    name: 'Світла',
+    icon: '☀️',
+    primary: '#ff6b81',
+    secondary: '#9c27b0',
+    accent: '#ffd700',
+    bgGradientStart: '#fce4ec',
+    bgGradientMiddle: '#f8bbd0',
+    bgGradientEnd: '#f3e5f5',
+    glassBg: 'rgba(255, 255, 255, 0.85)',
+    glassBorder: 'rgba(255, 255, 255, 0.5)',
+    textPrimary: '#2d1b3e',
+    textSecondary: '#666'
+  },
+  dark: {
+    name: 'Темна',
+    icon: '🌙',
+    primary: '#ff6b81',
+    secondary: '#bb86fc',
+    accent: '#ffd700',
+    bgGradientStart: '#1a1a2e',
+    bgGradientMiddle: '#16213e',
+    bgGradientEnd: '#0f0f23',
+    glassBg: 'rgba(30, 30, 50, 0.85)',
+    glassBorder: 'rgba(255, 255, 255, 0.1)',
+    textPrimary: '#e0e0e0',
+    textSecondary: '#b0b0b0'
+  },
+  sunset: {
+    name: 'Захід',
+    icon: '🌅',
+    primary: '#FF6B6B',
+    secondary: '#FFD93D',
+    accent: '#6C5CE7',
+    bgGradientStart: '#FF6B6B',
+    bgGradientMiddle: '#FFB347',
+    bgGradientEnd: '#FFD93D',
+    glassBg: 'rgba(255, 255, 255, 0.8)',
+    glassBorder: 'rgba(255, 255, 255, 0.4)',
+    textPrimary: '#2d1b3e',
+    textSecondary: '#555'
+  },
+  ocean: {
+    name: 'Океан',
+    icon: '🌊',
+    primary: '#4ECDC4',
+    secondary: '#556FB5',
+    accent: '#44A08D',
+    bgGradientStart: '#e0f7fa',
+    bgGradientMiddle: '#80deea',
+    bgGradientEnd: '#b2dfdb',
+    glassBg: 'rgba(255, 255, 255, 0.85)',
+    glassBorder: 'rgba(255, 255, 255, 0.5)',
+    textPrimary: '#1a3a52',
+    textSecondary: '#4a6b7c'
+  },
+  lavender: {
+    name: 'Лаванда',
+    icon: '💜',
+    primary: '#9D84B7',
+    secondary: '#C5A3FF',
+    accent: '#E0BBE4',
+    bgGradientStart: '#f4e7ff',
+    bgGradientMiddle: '#e5d4ff',
+    bgGradientEnd: '#d1b3ff',
+    glassBg: 'rgba(255, 255, 255, 0.85)',
+    glassBorder: 'rgba(255, 255, 255, 0.5)',
+    textPrimary: '#3d2951',
+    textSecondary: '#6d5b7b'
+  },
+  roseGold: {
+    name: 'Рожеве золото',
+    icon: '✨',
+    primary: '#E8B4B8',
+    secondary: '#D4A5A5',
+    accent: '#F5CBA7',
+    bgGradientStart: '#ffeef0',
+    bgGradientMiddle: '#ffe4e6',
+    bgGradientEnd: '#ffd6d9',
+    glassBg: 'rgba(255, 255, 255, 0.9)',
+    glassBorder: 'rgba(255, 255, 255, 0.6)',
+    textPrimary: '#5d3a3a',
+    textSecondary: '#8a6969'
+  },
+  midnight: {
+    name: 'Опівніч',
+    icon: '🌌',
+    primary: '#667EEA',
+    secondary: '#764BA2',
+    accent: '#F093FB',
+    bgGradientStart: '#0f0c29',
+    bgGradientMiddle: '#302b63',
+    bgGradientEnd: '#24243e',
+    glassBg: 'rgba(20, 20, 40, 0.85)',
+    glassBorder: 'rgba(255, 255, 255, 0.15)',
+    textPrimary: '#e8e8ff',
+    textSecondary: '#b8b8d0'
+  }
+};
+
 class ThemeManager {
   constructor() {
-    this.isDark = localStorage.getItem(CONFIG.THEME_KEY) === 'dark';
+    const savedTheme = localStorage.getItem(CONFIG.THEME_KEY);
+
+    // Migrate from old light/dark system
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      this.currentTheme = savedTheme;
+    } else if (savedTheme && THEMES[savedTheme]) {
+      this.currentTheme = savedTheme;
+    } else {
+      this.currentTheme = 'light';
+    }
+
+    // Legacy support
+    this.isDark = this.currentTheme === 'dark';
   }
 
   init() {
@@ -213,14 +326,58 @@ class ThemeManager {
   }
 
   toggle() {
-    this.isDark = !this.isDark;
-    localStorage.setItem(CONFIG.THEME_KEY, this.isDark ? 'dark' : 'light');
+    // Simple toggle between light and dark for backward compatibility
+    this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+    this.isDark = this.currentTheme === 'dark';
+    localStorage.setItem(CONFIG.THEME_KEY, this.currentTheme);
     this.apply();
     return this.isDark;
   }
 
+  setTheme(themeName) {
+    if (!THEMES[themeName]) {
+      console.error('Theme not found:', themeName);
+      return false;
+    }
+
+    this.currentTheme = themeName;
+    this.isDark = themeName === 'dark' || themeName === 'midnight';
+    localStorage.setItem(CONFIG.THEME_KEY, themeName);
+    this.apply();
+    return true;
+  }
+
   apply() {
+    const theme = THEMES[this.currentTheme];
+    if (!theme) return;
+
+    // Apply data-theme for legacy styles
     document.documentElement.setAttribute('data-theme', this.isDark ? 'dark' : 'light');
+
+    // Apply CSS variables for the selected theme
+    const root = document.documentElement;
+    root.style.setProperty('--color-primary', theme.primary);
+    root.style.setProperty('--color-secondary', theme.secondary);
+    root.style.setProperty('--color-accent', theme.accent);
+    root.style.setProperty('--bg-gradient-start', theme.bgGradientStart);
+    root.style.setProperty('--bg-gradient-middle', theme.bgGradientMiddle);
+    root.style.setProperty('--bg-gradient-end', theme.bgGradientEnd);
+    root.style.setProperty('--glass-bg', theme.glassBg);
+    root.style.setProperty('--glass-border', theme.glassBorder);
+    root.style.setProperty('--text-primary', theme.textPrimary);
+    root.style.setProperty('--text-secondary', theme.textSecondary);
+  }
+
+  getCurrentTheme() {
+    return this.currentTheme;
+  }
+
+  getThemeList() {
+    return Object.entries(THEMES).map(([key, theme]) => ({
+      key,
+      name: theme.name,
+      icon: theme.icon
+    }));
   }
 }
 
@@ -974,11 +1131,151 @@ class DateRandomizerApp {
 
     toggle.classList.toggle('dark', this.themeManager.isDark);
 
-    toggle.addEventListener('click', () => {
-      const isDark = this.themeManager.toggle();
-      toggle.classList.toggle('dark', isDark);
-      this.soundManager.playClick();
+    let longPressTimer = null;
+    let isLongPress = false;
+
+    const handlePress = (e) => {
+      isLongPress = false;
+      longPressTimer = setTimeout(() => {
+        isLongPress = true;
+        Utils.vibrate([50, 30, 50]);
+        this.showThemePicker();
+      }, 500); // 500ms for long press
+    };
+
+    const handleRelease = () => {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+
+      if (!isLongPress) {
+        // Normal click - toggle light/dark
+        const isDark = this.themeManager.toggle();
+        toggle.classList.toggle('dark', isDark);
+        this.soundManager.playClick();
+      }
+    };
+
+    // Mouse events
+    toggle.addEventListener('mousedown', handlePress);
+    toggle.addEventListener('mouseup', handleRelease);
+    toggle.addEventListener('mouseleave', () => {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
     });
+
+    // Touch events
+    toggle.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handlePress();
+    });
+    toggle.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      handleRelease();
+    });
+  }
+
+  showThemePicker() {
+    // Check if theme picker already exists
+    let picker = Utils.$('#themePicker');
+
+    if (picker) {
+      // If it exists, just show it
+      picker.classList.add('visible');
+      return;
+    }
+
+    // Create theme picker modal
+    picker = document.createElement('div');
+    picker.id = 'themePicker';
+    picker.className = 'theme-picker';
+    picker.innerHTML = `
+      <div class="theme-picker-overlay"></div>
+      <div class="theme-picker-content glass-card">
+        <div class="card-glow"></div>
+        <button class="theme-picker-close" aria-label="Закрити">
+          <i class="fas fa-times"></i>
+        </button>
+        <h3 class="theme-picker-title">Обери тему</h3>
+        <div class="theme-grid"></div>
+      </div>
+    `;
+
+    document.body.appendChild(picker);
+
+    const grid = picker.querySelector('.theme-grid');
+    const themes = this.themeManager.getThemeList();
+    const currentTheme = this.themeManager.getCurrentTheme();
+
+    themes.forEach(({ key, name, icon }) => {
+      const card = document.createElement('button');
+      card.className = 'theme-card';
+      card.dataset.theme = key;
+      if (key === currentTheme) {
+        card.classList.add('active');
+      }
+
+      card.innerHTML = `
+        <span class="theme-icon">${icon}</span>
+        <span class="theme-name">${name}</span>
+        <div class="theme-preview" style="background: linear-gradient(135deg,
+          ${THEMES[key].bgGradientStart},
+          ${THEMES[key].bgGradientMiddle},
+          ${THEMES[key].bgGradientEnd})">
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        this.themeManager.setTheme(key);
+
+        // Update UI
+        const toggle = Utils.$('#themeToggle');
+        if (toggle) {
+          toggle.classList.toggle('dark', this.themeManager.isDark);
+        }
+
+        // Update active state
+        picker.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+
+        this.soundManager.playSuccess();
+        Utils.vibrate(100);
+
+        // Close picker after a short delay
+        setTimeout(() => {
+          this.hideThemePicker();
+        }, 300);
+      });
+
+      grid.appendChild(card);
+    });
+
+    // Setup close handlers
+    const closeBtn = picker.querySelector('.theme-picker-close');
+    const overlay = picker.querySelector('.theme-picker-overlay');
+
+    closeBtn.addEventListener('click', () => this.hideThemePicker());
+    overlay.addEventListener('click', () => this.hideThemePicker());
+
+    // Show picker with animation
+    requestAnimationFrame(() => {
+      picker.classList.add('visible');
+    });
+
+    this.soundManager.playClick();
+  }
+
+  hideThemePicker() {
+    const picker = Utils.$('#themePicker');
+    if (!picker) return;
+
+    picker.classList.remove('visible');
+    setTimeout(() => {
+      picker.remove();
+    }, 300);
   }
 
   setupSoundToggle() {
