@@ -628,6 +628,7 @@ body {
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .btn::before {
@@ -768,6 +769,27 @@ body {
   0% { transform: scale(0.95); }
   50% { transform: scale(1.02); }
   100% { transform: scale(1); }
+}
+
+/* 3D Card Flip Animation */
+.stage-card.card-flipping {
+  animation: card3DFlip 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+@keyframes card3DFlip {
+  0% {
+    transform: perspective(1000px) rotateY(0deg) scale(0.95);
+    filter: blur(6px);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(90deg) scale(1);
+    filter: blur(3px);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(0deg) scale(1);
+    filter: blur(0px);
+  }
 }
 
 .stage-card.confirmed {
@@ -1401,4 +1423,227 @@ body {
   .theme-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+/* ============================================
+   FLUID PAGE TRANSITIONS
+   ============================================ */
+
+/* Slide Transitions */
+.transition-slide-out {
+  animation: slideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.transition-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade Transitions */
+.transition-fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.transition-fade-in {
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Zoom Transitions */
+.transition-zoom-out {
+  animation: zoomOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.transition-zoom-in {
+  animation: zoomIn 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+@keyframes zoomOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Flip Transitions */
+.transition-flip-out {
+  animation: flipOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.transition-flip-in {
+  animation: flipIn 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+@keyframes flipOut {
+  from {
+    opacity: 1;
+    transform: perspective(400px) rotateY(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: perspective(400px) rotateY(-90deg);
+  }
+}
+
+@keyframes flipIn {
+  from {
+    opacity: 0;
+    transform: perspective(400px) rotateY(90deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(400px) rotateY(0deg);
+  }
+}
+
+/* ============================================
+   MICRO-INTERACTIONS
+   ============================================ */
+
+/* Ripple Effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  animation: ripple-animation 0.6s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes ripple-animation {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Button Hover */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Shimmer Effect */
+.btn-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(30deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(30deg);
+  }
+}
+
+/* Emoji Button Enhanced Interactions */
+.emoji-btn {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.emoji-btn::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--border-radius-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.emoji-btn:hover::before {
+  opacity: 0.3;
+}
+
+.emoji-btn:hover {
+  transform: translateY(-3px) scale(1.15);
+}
+
+.emoji-btn:active {
+  transform: translateY(0) scale(1.05);
+}
+
+/* Card Hover Depth */
+.glass-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 30px rgba(255, 107, 129, 0.2);
 }

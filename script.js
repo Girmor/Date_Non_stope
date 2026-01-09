@@ -390,11 +390,56 @@ class ParticlesEffect {
     this.container = container;
     this.particles = [];
     this.animationId = null;
+    this.mousePos = { x: -1000, y: -1000 };
+    this.setupMouseTracking();
   }
 
   init() {
     this.createParticles(30);
     this.animate();
+  }
+
+  setupMouseTracking() {
+    // Skip on touch devices for performance
+    if ('ontouchstart' in window) return;
+
+    document.addEventListener('mousemove', (e) => {
+      this.mousePos.x = e.clientX;
+      this.mousePos.y = e.clientY;
+      this.updateParticlePositions();
+    });
+  }
+
+  updateParticlePositions() {
+    this.particles.forEach((particle, index) => {
+      const rect = particle.getBoundingClientRect();
+      const particleX = rect.left + rect.width / 2;
+      const particleY = rect.top + rect.height / 2;
+
+      const distance = Math.hypot(
+        this.mousePos.x - particleX,
+        this.mousePos.y - particleY
+      );
+
+      const interactionRadius = 150;
+
+      if (distance < interactionRadius) {
+        const angle = Math.atan2(
+          particleY - this.mousePos.y,
+          particleX - this.mousePos.x
+        );
+        const force = (interactionRadius - distance) / interactionRadius;
+        const offsetX = Math.cos(angle) * force * 40;
+        const offsetY = Math.sin(angle) * force * 40;
+        const scale = 1 + force * 0.5;
+
+        particle.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        particle.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      } else {
+        particle.style.transform = '';
+        particle.style.transition = 'transform 0.5s ease-out';
+      }
+    });
   }
 
   createParticles(count) {
@@ -428,6 +473,45 @@ class ParticlesEffect {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
     }
+  }
+}
+
+// ============================================
+// TRANSITION MANAGER
+// ============================================
+
+class TransitionManager {
+  static async transition(fromElement, toElement, type = 'slide') {
+    if (!fromElement || !toElement) return;
+
+    const duration = 600; // ms
+
+    // Apply exit animation
+    fromElement.classList.add(`transition-${type}-out`);
+
+    await this.wait(duration / 2);
+
+    // Switch visibility
+    fromElement.classList.remove('active');
+    toElement.classList.add('active');
+
+    // Apply enter animation
+    toElement.classList.add(`transition-${type}-in`);
+
+    await this.wait(duration / 2);
+
+    // Cleanup
+    fromElement.classList.remove(`transition-${type}-out`);
+    toElement.classList.remove(`transition-${type}-in`);
+  }
+
+  static wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  static getRandomTransition() {
+    const types = ['slide', 'fade', 'zoom', 'flip'];
+    return types[Math.floor(Math.random() * types.length)];
   }
 }
 
@@ -867,7 +951,16 @@ class StageComponent {
 
   unlock() {
     this.element.classList.remove('locked');
-    this.element.classList.add('unlocked');
+
+    // Add 3D flip animation
+    this.element.style.transformStyle = 'preserve-3d';
+    this.element.classList.add('card-flipping');
+
+    setTimeout(() => {
+      this.element.classList.add('unlocked');
+      this.element.classList.remove('card-flipping');
+    }, 400);
+
     this.options.soundManager?.playUnlock();
   }
 
@@ -1298,20 +1391,23 @@ class DateRandomizerApp {
 
   setupIntroNavigation() {
     const buttons = Utils.$$('[data-next]');
-    
+
     console.log('Setting up intro navigation, found buttons:', buttons.length);
-    
+
     buttons.forEach(btn => {
       const nextStep = btn.dataset.next;
       console.log('Button found with data-next:', nextStep);
-      
+
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         console.log('Button clicked, navigating to:', nextStep);
-        
+
+        // Add ripple effect
+        this.createRipple(e, btn);
+
         this.soundManager.playClick();
         Utils.vibrate(50);
-        
+
         if (nextStep === 'stages') {
           this.startStages();
         } else {
@@ -1321,7 +1417,25 @@ class DateRandomizerApp {
     });
   }
 
-  navigateToScreen(screenId) {
+  createRipple(event, button) {
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+
+    ripple.style.width = ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+
+    button.appendChild(ripple);
+
+    setTimeout(() => ripple.remove(), 600);
+  }
+
+  async navigateToScreen(screenId) {
     const currentScreen = Utils.$('.screen.active');
     const nextScreen = Utils.$(`#${screenId}`);
 
@@ -1333,17 +1447,15 @@ class DateRandomizerApp {
     }
 
     if (currentScreen && currentScreen !== nextScreen) {
-      currentScreen.classList.add('fade-out');
-      setTimeout(() => {
-        currentScreen.classList.remove('active', 'fade-out');
-      }, 400);
+      // Use different transition types for variety
+      const transitionType = TransitionManager.getRandomTransition();
+      await TransitionManager.transition(currentScreen, nextScreen, transitionType);
+    } else {
+      nextScreen.classList.add('active');
     }
 
-    setTimeout(() => {
-      nextScreen.classList.add('active');
-      this.stateManager.update({ currentStep: screenId });
-      console.log('Screen activated:', screenId);
-    }, currentScreen && currentScreen !== nextScreen ? 250 : 0);
+    this.stateManager.update({ currentStep: screenId });
+    console.log('Screen activated:', screenId);
   }
 
   setupStages() {
