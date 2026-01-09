@@ -175,6 +175,29 @@ class SoundManager {
     setTimeout(() => this.playTone(659, 0.2, 'sine'), 300);
   }
 
+  playMystic() {
+    if (!this.enabled || !this.audioContext) return;
+
+    try {
+      const ctx = this.audioContext;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      // Містичний sweep effect
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.5);
+
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {
+      console.warn('Mystic sound playback failed:', e);
+    }
+  }
+
   playTone(frequency, duration, type = 'sine') {
     if (!this.audioContext) return;
     
@@ -301,6 +324,22 @@ const THEMES = {
     glassBorder: 'rgba(255, 255, 255, 0.15)',
     textPrimary: '#e8e8ff',
     textSecondary: '#b8b8d0'
+  },
+  mystic: {
+    name: 'Місячна магія',
+    icon: '🔮',
+    primary: '#9D84FF',
+    secondary: '#FFD700',
+    accent: '#E0C3FC',
+    bgGradientStart: '#1a0933',
+    bgGradientMiddle: '#2d1b4e',
+    bgGradientEnd: '#1a0933',
+    glassBg: 'rgba(157, 132, 255, 0.1)',
+    glassBorder: 'rgba(157, 132, 255, 0.3)',
+    textPrimary: '#E0E6FF',
+    textSecondary: '#B8B8D4',
+    glow: '0 0 20px rgba(157, 132, 255, 0.5), 0 0 40px rgba(157, 132, 255, 0.3)',
+    particleColor: '#FFD700'
   }
 };
 
@@ -314,11 +353,11 @@ class ThemeManager {
     } else if (savedTheme && THEMES[savedTheme]) {
       this.currentTheme = savedTheme;
     } else {
-      this.currentTheme = 'light';
+      this.currentTheme = 'mystic';
     }
 
     // Legacy support
-    this.isDark = this.currentTheme === 'dark';
+    this.isDark = this.currentTheme === 'dark' || this.currentTheme === 'midnight' || this.currentTheme === 'mystic';
   }
 
   init() {
@@ -341,7 +380,7 @@ class ThemeManager {
     }
 
     this.currentTheme = themeName;
-    this.isDark = themeName === 'dark' || themeName === 'midnight';
+    this.isDark = themeName === 'dark' || themeName === 'midnight' || themeName === 'mystic';
     localStorage.setItem(CONFIG.THEME_KEY, themeName);
     this.apply();
     return true;
@@ -351,8 +390,8 @@ class ThemeManager {
     const theme = THEMES[this.currentTheme];
     if (!theme) return;
 
-    // Apply data-theme for legacy styles
-    document.documentElement.setAttribute('data-theme', this.isDark ? 'dark' : 'light');
+    // Apply data-theme attribute with actual theme name for mystic styles
+    document.documentElement.setAttribute('data-theme', this.currentTheme);
 
     // Apply CSS variables for the selected theme
     const root = document.documentElement;
@@ -366,6 +405,14 @@ class ThemeManager {
     root.style.setProperty('--glass-border', theme.glassBorder);
     root.style.setProperty('--text-primary', theme.textPrimary);
     root.style.setProperty('--text-secondary', theme.textSecondary);
+
+    // Apply mystic-specific properties if they exist
+    if (theme.glow) {
+      root.style.setProperty('--mystic-glow', theme.glow);
+    }
+    if (theme.particleColor) {
+      root.style.setProperty('--mystic-particle-color', theme.particleColor);
+    }
   }
 
   getCurrentTheme() {
@@ -1164,6 +1211,82 @@ class StageComponent {
 }
 
 // ============================================
+// MYSTIC STAGE COMPONENT
+// ============================================
+
+class MysticStageComponent extends StageComponent {
+  render() {
+    const card = super.render();
+
+    // Додати містичні елементи
+    card.classList.add('mystic-card');
+
+    // Додати магічне коло навколо кнопки
+    const spinBtn = card.querySelector('.btn-spin');
+    if (spinBtn) {
+      const magicCircle = document.createElement('div');
+      magicCircle.className = 'magic-circle';
+      spinBtn.style.position = 'relative';
+      spinBtn.appendChild(magicCircle);
+    }
+
+    // Додати зірки навколо картки
+    this.addFloatingStars(card);
+
+    return card;
+  }
+
+  addFloatingStars(container) {
+    const starsContainer = document.createElement('div');
+    starsContainer.className = 'floating-stars-container';
+
+    for (let i = 0; i < 8; i++) {
+      const star = document.createElement('div');
+      star.className = 'floating-star';
+      star.innerHTML = '✨';
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDelay = `${Math.random() * 3}s`;
+      starsContainer.appendChild(star);
+    }
+
+    container.appendChild(starsContainer);
+  }
+
+  async spin() {
+    const card = this.element;
+
+    // Додати містичний ефект перед спіном
+    card.classList.add('mystic-spinning');
+    this.showMysticEffect();
+
+    // Викликати оригінальний spin
+    await super.spin();
+
+    // Прибрати ефект
+    card.classList.remove('mystic-spinning');
+    this.hideMysticEffect();
+  }
+
+  showMysticEffect() {
+    // Створити магічне сяйво
+    const glow = document.createElement('div');
+    glow.className = 'mystic-glow-overlay';
+    this.element.appendChild(glow);
+
+    // Звук містичного ефекту
+    this.options.soundManager?.playMystic?.();
+  }
+
+  hideMysticEffect() {
+    const glow = this.element.querySelector('.mystic-glow-overlay');
+    if (glow) {
+      setTimeout(() => glow.remove(), 300);
+    }
+  }
+}
+
+// ============================================
 // ROADMAP GENERATOR
 // ============================================
 
@@ -1637,7 +1760,7 @@ class DateRandomizerApp {
     if (!container) return;
 
     DATE_OPTIONS.stages.forEach((stageData, index) => {
-      const component = new GridStageComponent(stageData, index, {
+      const component = new MysticStageComponent(stageData, index, {
         soundManager: this.soundManager,
         onSpin: (idx, selectedIndex) => {
           this.stateManager.updateStage(idx, { selectedIndex });

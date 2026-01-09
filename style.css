@@ -2142,3 +2142,180 @@ body {
     justify-content: center;
   }
 }
+
+/* ============================================
+   MYSTIC THEME STYLES
+   ============================================ */
+
+/* Містичні анімації */
+@keyframes mystic-twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes mystic-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes mystic-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary);
+  }
+  50% {
+    box-shadow: 0 0 30px var(--color-primary), 0 0 60px var(--color-primary);
+  }
+}
+
+@keyframes mystic-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes mystic-stars-move {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+}
+
+/* Містична картка */
+.stage-card.mystic-card {
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  box-shadow: var(--mystic-glow, 0 0 20px rgba(157, 132, 255, 0.5));
+  animation: mystic-float 4s ease-in-out infinite;
+  position: relative;
+  overflow: visible;
+}
+
+/* Контейнер для плаваючих зірок */
+.floating-stars-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+/* Плаваючі зірки */
+.floating-star {
+  position: absolute;
+  font-size: 1.5rem;
+  pointer-events: none;
+  animation: mystic-twinkle 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px var(--mystic-particle-color, #FFD700));
+}
+
+/* Магічне коло навколо кнопки */
+.magic-circle {
+  position: absolute;
+  inset: -10px;
+  border: 2px solid var(--color-secondary);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.btn-spin:hover .magic-circle,
+.btn-primary:hover .magic-circle {
+  opacity: 1;
+  animation: mystic-rotate 2s linear infinite;
+}
+
+/* Ефект під час спіну */
+.mystic-spinning {
+  animation: mystic-glow-pulse 0.5s ease-in-out infinite;
+}
+
+.mystic-glow-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(157, 132, 255, 0.3), transparent 70%);
+  pointer-events: none;
+  z-index: 10;
+  animation: pulse-glow 1s ease-in-out infinite;
+  border-radius: inherit;
+}
+
+/* Містичний фон з зірками */
+body[data-theme="mystic"]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, white, transparent),
+    radial-gradient(2px 2px at 60% 70%, white, transparent),
+    radial-gradient(1px 1px at 50% 50%, white, transparent),
+    radial-gradient(1px 1px at 80% 10%, white, transparent),
+    radial-gradient(2px 2px at 90% 60%, white, transparent),
+    radial-gradient(1px 1px at 10% 80%, white, transparent),
+    radial-gradient(2px 2px at 40% 20%, white, transparent),
+    radial-gradient(1px 1px at 70% 90%, white, transparent);
+  background-size: 200% 200%;
+  animation: mystic-stars-move 20s ease infinite;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Містичний градієнт для body */
+body[data-theme="mystic"] {
+  background: linear-gradient(135deg,
+    var(--bg-gradient-start) 0%,
+    var(--bg-gradient-middle) 50%,
+    var(--bg-gradient-end) 100%);
+}
+
+/* Покращення для містичної теми */
+body[data-theme="mystic"] .glass-card {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              0 0 20px rgba(157, 132, 255, 0.2);
+}
+
+body[data-theme="mystic"] .btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  box-shadow: 0 4px 15px rgba(157, 132, 255, 0.4);
+  position: relative;
+}
+
+body[data-theme="mystic"] .btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(157, 132, 255, 0.6);
+  transform: translateY(-2px);
+}
+
+body[data-theme="mystic"] .option-display {
+  filter: drop-shadow(0 0 10px rgba(157, 132, 255, 0.3));
+}
+
+body[data-theme="mystic"] .particles {
+  filter: drop-shadow(0 0 3px var(--mystic-particle-color, #FFD700));
+}
