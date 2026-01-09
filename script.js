@@ -399,7 +399,7 @@ class ParticlesEffect {
 
   createParticles(count) {
     const symbols = ['✨', '💫', '⭐', '🌟', '💖', '🎀', '🌸'];
-    
+
     for (let i = 0; i < count; i++) {
       const particle = document.createElement('span');
       particle.className = 'particle';
@@ -415,6 +415,11 @@ class ParticlesEffect {
       this.container.appendChild(particle);
       this.particles.push(particle);
     }
+  }
+
+  animate() {
+    // Particles are animated via CSS, this method is just a placeholder
+    // to satisfy the init() call
   }
 
   destroy() {
