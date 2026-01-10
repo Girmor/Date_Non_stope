@@ -1826,9 +1826,18 @@ class RoadmapGenerator {
       this.stateManager.isStageConfirmed(i)
     );
 
+    console.log('Confirmed stages:', confirmedStages.length);
+
+    if (confirmedStages.length === 0) {
+      console.warn('No confirmed stages to display!');
+      return;
+    }
+
     const width = 500; // Зменшено з 600
     const stageHeight = 110; // Зменшено з 140 для компактності
     const height = confirmedStages.length * stageHeight + 100; // Менший відступ
+
+    console.log('Canvas dimensions:', width, 'x', height);
 
     canvas.width = width;
     canvas.height = height;
@@ -1872,12 +1881,15 @@ class RoadmapGenerator {
     const pathX = width / 2;
     let currentY = 80; // Менший початковий відступ
 
+    // Спочатку порахуємо скільки підтверджених стадій
+    let stageIndex = 0;
+
     ctx.strokeStyle = '#ff6b81';
     ctx.lineWidth = 4;
     ctx.setLineDash([10, 5]);
     ctx.beginPath();
     ctx.moveTo(pathX, currentY);
-    ctx.lineTo(pathX, height - 30);
+    ctx.lineTo(pathX, height - 20); // Скоректована кінцева точка
     ctx.stroke();
     ctx.setLineDash([]);
 
@@ -1888,7 +1900,7 @@ class RoadmapGenerator {
 
       const stage = this.stages[i];
       const option = stage.options[stageState.selectedIndex];
-      const y = currentY + 30;
+      const y = currentY + (stageIndex === 0 ? 20 : 0); // Менший відступ для першого елемента
 
       // Завантажити і намалювати міні-фото
       try {
@@ -1971,6 +1983,7 @@ class RoadmapGenerator {
       ctx.shadowBlur = 0;
 
       currentY += stageHeight;
+      stageIndex++; // Збільшуємо індекс підтверджених стадій
     }
 
     // Footer
