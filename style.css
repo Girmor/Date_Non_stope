@@ -2488,9 +2488,7 @@ body[data-theme="mystic"] .particles {
 }
 
 .topics-container.visible {
-  display: flex !important;
-  flex-direction: column;
-  align-items: flex-end;
+  display: block !important; /* Show when timer is active */
 }
 
 /* Floating toggle button */

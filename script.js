@@ -710,8 +710,11 @@ class ConversationTopics {
       </div>
     `;
 
-    // Create wrapper container
+    // Create wrapper with proper styling
     const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.alignItems = 'flex-end';
     wrapper.appendChild(toggleBtn);
     wrapper.appendChild(panel);
 
