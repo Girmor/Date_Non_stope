@@ -1367,7 +1367,8 @@ class MysticStageComponent extends StageComponent {
     this.isSpinning = false;
 
     soundManager?.playSuccess();
-    Utils.vibrate(100);
+    // Сильна вібрація при показі результату
+    Utils.vibrate([200, 100, 200]);
 
     if (onSpin) {
       onSpin(this.index, selectedIndex);
@@ -1466,12 +1467,12 @@ class RoadmapGenerator {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    const confirmedStages = this.stages.filter((_, i) => 
+    const confirmedStages = this.stages.filter((_, i) =>
       this.stateManager.isStageConfirmed(i)
     );
 
     const width = 600;
-    const stageHeight = 180;
+    const stageHeight = 140; // Зменшено з 180
     const height = confirmedStages.length * stageHeight + 120;
 
     canvas.width = width;
@@ -1534,9 +1535,40 @@ class RoadmapGenerator {
       const option = stage.options[stageState.selectedIndex];
       const y = currentY + 30;
 
-      // Stage circle
+      // Завантажити і намалювати міні-фото
+      try {
+        const img = new Image();
+        img.src = option.image;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve; // Продовжити навіть якщо фото не завантажилось
+        });
+
+        // Малюємо круглу міні-фотографію
+        const imgSize = 60;
+        const imgX = pathX - 120; // Зліва від центру
+        const imgY = y - imgSize / 2;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+        ctx.restore();
+
+        // Рамка навколо фото
+        ctx.beginPath();
+        ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      } catch (e) {
+        console.warn('Failed to load image:', option.image);
+      }
+
+      // Stage circle з емоджі
       ctx.beginPath();
-      ctx.arc(pathX, y, 25, 0, Math.PI * 2);
+      ctx.arc(pathX, y, 20, 0, Math.PI * 2); // Зменшено з 25 до 20
       ctx.fillStyle = '#ffd700';
       ctx.fill();
       ctx.strokeStyle = '#ff6b81';
@@ -1544,23 +1576,23 @@ class RoadmapGenerator {
       ctx.stroke();
 
       // Emoji
-      ctx.font = '24px serif';
+      ctx.font = '20px serif'; // Зменшено з 24px
       ctx.fillStyle = '#2d1b3e';
       ctx.textAlign = 'center';
-      ctx.fillText(stage.emoji, pathX, y + 8);
+      ctx.fillText(stage.emoji, pathX, y + 7);
 
       // Text box
       const text = option.text;
-      ctx.font = 'bold 16px "Montserrat", sans-serif';
+      ctx.font = 'bold 14px "Montserrat", sans-serif'; // Зменшено з 16px
       const textWidth = ctx.measureText(text).width;
-      const boxWidth = textWidth + 40;
-      const boxHeight = 35;
+      const boxWidth = textWidth + 30; // Зменшено padding
+      const boxHeight = 30; // Зменшено з 35
       const boxX = pathX - boxWidth / 2;
-      const boxY = y + 35;
+      const boxY = y + 30; // Зменшено відступ
 
       // Box background
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      this.roundRect(ctx, boxX, boxY, boxWidth, boxHeight, 10);
+      this.roundRect(ctx, boxX, boxY, boxWidth, boxHeight, 8);
       ctx.fill();
       ctx.strokeStyle = '#ffd700';
       ctx.lineWidth = 2;
@@ -1569,7 +1601,7 @@ class RoadmapGenerator {
       // Text
       ctx.fillStyle = '#2d1b3e';
       ctx.textAlign = 'center';
-      ctx.fillText(text, pathX, boxY + 23);
+      ctx.fillText(text, pathX, boxY + 20);
 
       currentY += stageHeight;
     }
