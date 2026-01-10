@@ -1938,25 +1938,37 @@ class RoadmapGenerator {
 
       // Text box
       const text = option.text;
-      ctx.font = 'bold 14px "Montserrat", sans-serif'; // Зменшено з 16px
+      ctx.font = 'bold 16px "Montserrat", sans-serif'; // Збільшено для кращої читабельності
       const textWidth = ctx.measureText(text).width;
-      const boxWidth = textWidth + 30; // Зменшено padding
-      const boxHeight = 30; // Зменшено з 35
+      const boxWidth = textWidth + 40; // Більше padding
+      const boxHeight = 36; // Більша висота
       const boxX = pathX - boxWidth / 2;
       const boxY = y + 30; // Зменшено відступ
 
-      // Box background
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      this.roundRect(ctx, boxX, boxY, boxWidth, boxHeight, 8);
+      // Box background з кращим контрастом
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'; // Більш непрозорий фон
+      this.roundRect(ctx, boxX, boxY, boxWidth, boxHeight, 10);
       ctx.fill();
       ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 3; // Товща рамка
       ctx.stroke();
 
-      // Text
-      ctx.fillStyle = '#2d1b3e';
+      // Text з тінню для кращої читабельності
+      ctx.fillStyle = '#1a0933'; // Темніший фіолетовий
       ctx.textAlign = 'center';
-      ctx.fillText(text, pathX, boxY + 20);
+      ctx.textBaseline = 'middle';
+
+      // Додаємо тінь для чіткості
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+      ctx.shadowBlur = 2;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 1;
+
+      ctx.fillText(text, pathX, boxY + boxHeight / 2);
+
+      // Скидаємо тінь
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
 
       currentY += stageHeight;
     }

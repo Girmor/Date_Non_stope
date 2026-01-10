@@ -2567,15 +2567,17 @@ body[data-theme="mystic"] .particles {
 .topics-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #2d1b4e; /* Dark purple for contrast */
   margin: 0 0 var(--space-xs) 0;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .topics-subtitle {
   font-size: 0.9rem;
-  color: var(--text-secondary);
-  opacity: 0.8;
+  color: #5a4069; /* Medium purple */
+  opacity: 1;
   margin: 0;
+  font-weight: 500;
 }
 
 .topics-categories {
@@ -2588,26 +2590,28 @@ body[data-theme="mystic"] .particles {
 
 .topic-category-btn {
   padding: var(--space-xs) var(--space-sm);
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(181, 101, 216, 0.3);
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: var(--text-primary);
+  color: #2d1b4e; /* Dark purple for contrast */
 }
 
 .topic-category-btn:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.9);
   transform: translateY(-2px);
+  border-color: rgba(181, 101, 216, 0.5);
 }
 
 .topic-category-btn.active {
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #B565D8, #9D84FF);
   color: white;
-  border-color: var(--color-secondary);
-  box-shadow: 0 4px 12px rgba(181, 101, 216, 0.4);
+  border-color: #ffd700;
+  box-shadow: 0 4px 12px rgba(181, 101, 216, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .topic-card-container {
@@ -2617,15 +2621,15 @@ body[data-theme="mystic"] .particles {
 .topic-card {
   position: relative;
   padding: var(--space-lg);
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid var(--color-secondary);
+  background: rgba(255, 255, 255, 0.98); /* Більш непрозорий */
+  border: 3px solid #ffd700; /* Золота рамка */
   border-radius: 15px;
   min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 24px rgba(181, 101, 216, 0.3);
+  box-shadow: 0 8px 24px rgba(181, 101, 216, 0.4), 0 0 0 1px rgba(181, 101, 216, 0.1); /* Подвійна тінь */
 }
 
 .topic-content {
@@ -2636,9 +2640,9 @@ body[data-theme="mystic"] .particles {
 .topic-text {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: var(--text-primary);
+  color: #2d1b4e; /* Dark purple for better contrast on white */
   margin: 0;
-  font-weight: 500;
+  font-weight: 600; /* Bolder for better readability */
 }
 
 .topic-favorite-btn {
