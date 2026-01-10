@@ -1211,78 +1211,245 @@ class StageComponent {
 }
 
 // ============================================
-// MYSTIC STAGE COMPONENT
+// MYSTIC STAGE COMPONENT - Tarot Card Carousel
 // ============================================
 
 class MysticStageComponent extends StageComponent {
   render() {
-    const card = super.render();
+    const stage = document.createElement('section');
+    stage.className = 'stage-card mystic-tarot-card glass-card locked';
+    stage.dataset.index = this.index;
+    stage.id = `stage-${this.index}`;
 
-    // Додати містичні елементи
-    card.classList.add('mystic-card');
+    stage.innerHTML = `
+      <div class="card-glow"></div>
 
-    // Додати магічне коло навколо кнопки
-    const spinBtn = card.querySelector('.btn-spin');
-    if (spinBtn) {
-      const magicCircle = document.createElement('div');
-      magicCircle.className = 'magic-circle';
-      spinBtn.style.position = 'relative';
-      spinBtn.appendChild(magicCircle);
-    }
+      <div class="floating-stars-container">
+        ${this.generateStars()}
+      </div>
 
-    // Додати зірки навколо картки
-    this.addFloatingStars(card);
+      <header class="stage-header mystic-header">
+        <div class="stage-icon mystic-icon">
+          <i class="fas ${this.data.icon}"></i>
+        </div>
+        <h2 class="stage-title mystic-title">${this.data.question}</h2>
+      </header>
 
-    return card;
+      <div class="stage-content mystic-content">
+        <div class="mystic-carousel-container">
+          <div class="option-display mystic-display">
+            <div class="mystic-card-wrapper">
+              <div class="mystic-card-inner">
+                <div class="mystic-card-front">
+                  <div class="card-back-pattern">🔮</div>
+                </div>
+                <div class="mystic-card-back">
+                  <img class="option-image mystic-image" src="" alt="Обрана опція">
+                  <div class="image-mystic-frame"></div>
+                </div>
+              </div>
+            </div>
+            <p class="option-name mystic-name"></p>
+          </div>
+        </div>
+
+        <div class="stage-actions mystic-actions">
+          <button class="btn btn-primary btn-spin mystic-btn">
+            <div class="magic-circle"></div>
+            <i class="fas fa-hand-sparkles"></i>
+            <span>Обрати варіант</span>
+          </button>
+
+          <div class="confirm-actions">
+            <button class="btn btn-success btn-confirm">
+              <i class="fas fa-check"></i>
+              <span>Підтверджую!</span>
+            </button>
+            <button class="btn btn-outline btn-retry">
+              <i class="fas fa-redo"></i>
+              <span>Інший варіант</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-lock-overlay">
+        <i class="fas fa-lock"></i>
+        <p>Очікування...</p>
+      </div>
+    `;
+
+    this.element = stage;
+    this.bindEvents();
+    return stage;
   }
 
-  addFloatingStars(container) {
-    const starsContainer = document.createElement('div');
-    starsContainer.className = 'floating-stars-container';
-
+  generateStars() {
+    let stars = '';
     for (let i = 0; i < 8; i++) {
-      const star = document.createElement('div');
-      star.className = 'floating-star';
-      star.innerHTML = '✨';
-      star.style.left = `${Math.random() * 100}%`;
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.animationDelay = `${Math.random() * 3}s`;
-      starsContainer.appendChild(star);
+      const left = Math.random() * 100;
+      const top = Math.random() * 100;
+      const delay = Math.random() * 3;
+      stars += `<div class="floating-star" style="left: ${left}%; top: ${top}%; animation-delay: ${delay}s;">✨</div>`;
     }
+    return stars;
+  }
 
-    container.appendChild(starsContainer);
+  bindEvents() {
+    const spinBtn = this.element.querySelector('.btn-spin');
+    const confirmBtn = this.element.querySelector('.btn-confirm');
+    const retryBtn = this.element.querySelector('.btn-retry');
+
+    spinBtn.addEventListener('click', () => this.spin());
+    confirmBtn.addEventListener('click', () => this.confirm());
+    retryBtn.addEventListener('click', () => this.retry());
   }
 
   async spin() {
-    const card = this.element;
+    if (this.isSpinning) return;
+    this.isSpinning = true;
 
-    // Додати містичний ефект перед спіном
-    card.classList.add('mystic-spinning');
-    this.showMysticEffect();
+    const { onSpin, soundManager } = this.options;
+    const display = this.element.querySelector('.option-display');
+    const cardWrapper = this.element.querySelector('.mystic-card-wrapper');
+    const img = this.element.querySelector('.option-image');
+    const name = this.element.querySelector('.option-name');
+    const confirmActions = this.element.querySelector('.confirm-actions');
+    const spinBtn = this.element.querySelector('.btn-spin');
 
-    // Викликати оригінальний spin
-    await super.spin();
+    spinBtn.disabled = true;
+    display.classList.add('visible');
+    confirmActions.classList.remove('visible');
 
-    // Прибрати ефект
-    card.classList.remove('mystic-spinning');
-    this.hideMysticEffect();
-  }
+    // Містичний ефект та звук
+    this.element.classList.add('mystic-spinning');
+    soundManager?.playMystic?.();
 
-  showMysticEffect() {
-    // Створити магічне сяйво
-    const glow = document.createElement('div');
-    glow.className = 'mystic-glow-overlay';
-    this.element.appendChild(glow);
+    Utils.vibrate([50, 30, 50]);
 
-    // Звук містичного ефекту
-    this.options.soundManager?.playMystic?.();
-  }
+    const options = this.data.options;
+    const cycles = Math.floor(CONFIG.SPIN_DURATION / CONFIG.SPIN_INTERVAL);
+    let count = 0;
 
-  hideMysticEffect() {
-    const glow = this.element.querySelector('.mystic-glow-overlay');
-    if (glow) {
-      setTimeout(() => glow.remove(), 300);
+    // Flip card and cycle through options
+    await new Promise(resolve => {
+      const interval = setInterval(() => {
+        const opt = options[count % options.length];
+        img.src = opt.image;
+        name.textContent = opt.text;
+
+        // Add flip animation
+        cardWrapper.style.transform = `rotateY(${count * 45}deg)`;
+
+        soundManager?.playSpin();
+
+        count++;
+
+        if (count >= cycles) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, CONFIG.SPIN_INTERVAL);
+    });
+
+    // Final selection
+    const selectedIndex = Math.floor(Math.random() * options.length);
+    const selected = options[selectedIndex];
+
+    img.src = selected.image;
+    name.textContent = selected.text;
+
+    // Final flip to show image
+    cardWrapper.classList.add('flipped');
+
+    this.element.classList.remove('mystic-spinning');
+    confirmActions.classList.add('visible');
+    spinBtn.disabled = false;
+    this.isSpinning = false;
+
+    soundManager?.playSuccess();
+    Utils.vibrate(100);
+
+    if (onSpin) {
+      onSpin(this.index, selectedIndex);
     }
+  }
+
+  confirm() {
+    const { onConfirm, soundManager } = this.options;
+    const confirmActions = this.element.querySelector('.confirm-actions');
+    const spinBtn = this.element.querySelector('.btn-spin');
+
+    confirmActions.classList.remove('visible');
+    spinBtn.classList.add('hidden');
+    this.element.classList.add('confirmed');
+
+    soundManager?.playSuccess();
+    Utils.vibrate([100, 50, 100]);
+
+    // Trigger confetti
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#9D84FF', '#FFD700', '#E0C3FC', '#ff9ff3']
+      });
+    }
+
+    if (onConfirm) {
+      onConfirm(this.index);
+    }
+  }
+
+  retry() {
+    const { onRetry } = this.options;
+    const display = this.element.querySelector('.option-display');
+    const cardWrapper = this.element.querySelector('.mystic-card-wrapper');
+    const confirmActions = this.element.querySelector('.confirm-actions');
+    const spinBtn = this.element.querySelector('.btn-spin');
+
+    cardWrapper.classList.remove('flipped');
+    cardWrapper.style.transform = '';
+    display.classList.remove('visible');
+    confirmActions.classList.remove('visible');
+    spinBtn.disabled = false;
+
+    if (onRetry) {
+      onRetry(this.index);
+    }
+  }
+
+  unlock() {
+    this.element.classList.remove('locked');
+    this.element.classList.add('unlocked');
+    this.options.soundManager?.playUnlock();
+  }
+
+  lock() {
+    this.element.classList.add('locked');
+    this.element.classList.remove('unlocked');
+  }
+
+  setSelected(selectedIndex) {
+    if (selectedIndex === null) return;
+
+    const opt = this.data.options[selectedIndex];
+    const display = this.element.querySelector('.option-display');
+    const cardWrapper = this.element.querySelector('.mystic-card-wrapper');
+    const img = this.element.querySelector('.option-image');
+    const name = this.element.querySelector('.option-name');
+
+    img.src = opt.image;
+    name.textContent = opt.text;
+    display.classList.add('visible');
+    cardWrapper.classList.add('flipped');
+  }
+
+  setConfirmed() {
+    const spinBtn = this.element.querySelector('.btn-spin');
+    spinBtn.classList.add('hidden');
+    this.element.classList.add('confirmed');
   }
 }
 
