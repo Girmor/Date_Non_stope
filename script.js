@@ -1826,9 +1826,9 @@ class RoadmapGenerator {
       this.stateManager.isStageConfirmed(i)
     );
 
-    const width = 600;
-    const stageHeight = 140; // Зменшено з 180
-    const height = confirmedStages.length * stageHeight + 120;
+    const width = 500; // Зменшено з 600
+    const stageHeight = 110; // Зменшено з 140 для компактності
+    const height = confirmedStages.length * stageHeight + 100; // Менший відступ
 
     canvas.width = width;
     canvas.height = height;
@@ -1852,25 +1852,25 @@ class RoadmapGenerator {
     }
 
     // Title
-    ctx.font = 'bold 28px "Playfair Display", serif';
+    ctx.font = 'bold 22px "Playfair Display", serif'; // Зменшено з 28px
     ctx.fillStyle = '#2d1b3e';
     ctx.textAlign = 'center';
-    ctx.fillText('✨ Цього дня ✨', width / 2, 45);
+    ctx.fillText('✨ Цього дня ✨', width / 2, 35); // Менший відступ
 
     // Date
     const today = new Date();
-    ctx.font = '16px "Montserrat", sans-serif';
+    ctx.font = '13px "Montserrat", sans-serif'; // Зменшено з 16px
     ctx.fillStyle = '#666';
     ctx.fillText(today.toLocaleDateString('uk-UA', { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
-    }), width / 2, 75);
+    }), width / 2, 60); // Зменшено відступ
 
     // Path line
     const pathX = width / 2;
-    let currentY = 100;
+    let currentY = 80; // Менший початковий відступ
 
     ctx.strokeStyle = '#ff6b81';
     ctx.lineWidth = 4;
@@ -1900,8 +1900,8 @@ class RoadmapGenerator {
         });
 
         // Малюємо круглу міні-фотографію
-        const imgSize = 60;
-        const imgX = pathX - 120; // Зліва від центру
+        const imgSize = 50; // Зменшено з 60
+        const imgX = pathX - 100; // Ближче до центру
         const imgY = y - imgSize / 2;
 
         ctx.save();
@@ -1923,27 +1923,27 @@ class RoadmapGenerator {
 
       // Stage circle з емоджі
       ctx.beginPath();
-      ctx.arc(pathX, y, 20, 0, Math.PI * 2); // Зменшено з 25 до 20
+      ctx.arc(pathX, y, 16, 0, Math.PI * 2); // Зменшено з 20 до 16
       ctx.fillStyle = '#ffd700';
       ctx.fill();
       ctx.strokeStyle = '#ff6b81';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2; // Тонша рамка
       ctx.stroke();
 
       // Emoji
-      ctx.font = '20px serif'; // Зменшено з 24px
+      ctx.font = '16px serif'; // Зменшено з 20px
       ctx.fillStyle = '#2d1b3e';
       ctx.textAlign = 'center';
-      ctx.fillText(stage.emoji, pathX, y + 7);
+      ctx.fillText(stage.emoji, pathX, y + 5);
 
       // Text box
       const text = option.text;
-      ctx.font = 'bold 16px "Montserrat", sans-serif'; // Збільшено для кращої читабельності
+      ctx.font = 'bold 14px "Montserrat", sans-serif'; // Зменшено з 16px
       const textWidth = ctx.measureText(text).width;
-      const boxWidth = textWidth + 40; // Більше padding
-      const boxHeight = 36; // Більша висота
+      const boxWidth = textWidth + 30; // Менший padding
+      const boxHeight = 30; // Менша висота
       const boxX = pathX - boxWidth / 2;
-      const boxY = y + 30; // Зменшено відступ
+      const boxY = y + 25; // Менший відступ
 
       // Box background з кращим контрастом
       ctx.fillStyle = 'rgba(255, 255, 255, 0.95)'; // Більш непрозорий фон
@@ -1974,9 +1974,9 @@ class RoadmapGenerator {
     }
 
     // Footer
-    ctx.font = 'italic 14px "Montserrat", sans-serif';
+    ctx.font = 'italic 12px "Montserrat", sans-serif'; // Зменшено
     ctx.fillStyle = '#888';
-    ctx.fillText('💖 Дякую за чудовий день! 💖', width / 2, height - 20);
+    ctx.fillText('💖 Дякую за чудовий день! 💖', width / 2, height - 15);
 
     container.innerHTML = '';
     canvas.style.maxWidth = '100%';

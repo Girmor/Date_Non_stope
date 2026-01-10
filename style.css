@@ -1150,12 +1150,41 @@ body {
 
 .roadmap-container {
   margin: var(--space-lg) 0;
+  max-height: 70vh; /* Обмежити висоту */
+  overflow-y: auto; /* Додати вертикальний scroll */
+  overflow-x: hidden; /* Сховати горизонтальний scroll */
+  padding: var(--space-sm);
+  border-radius: var(--border-radius-md);
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Стилізація scrollbar для містичної теми */
+.roadmap-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.roadmap-container::-webkit-scrollbar-track {
+  background: rgba(181, 101, 216, 0.1);
+  border-radius: 10px;
+}
+
+.roadmap-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #B565D8, #9D84FF);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.roadmap-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #9D84FF, #B565D8);
 }
 
 .roadmap-container canvas {
   max-width: 100%;
   border-radius: var(--border-radius-md);
   box-shadow: var(--shadow-lg);
+  display: block; /* Усунути зайві відступи */
+  margin: 0 auto; /* Центрувати */
 }
 
 /* Rating Section */
