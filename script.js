@@ -1855,7 +1855,7 @@ class RoadmapGenerator {
     ctx.font = 'bold 28px "Playfair Display", serif';
     ctx.fillStyle = '#2d1b3e';
     ctx.textAlign = 'center';
-    ctx.fillText('✨ Наш День ✨', width / 2, 45);
+    ctx.fillText('✨ Цього дня ✨', width / 2, 45);
 
     // Date
     const today = new Date();
@@ -1983,7 +1983,58 @@ class RoadmapGenerator {
     canvas.style.borderRadius = '15px';
     container.appendChild(canvas);
 
+    // Add download button
+    this.addDownloadButton(container, canvas);
+
     return canvas;
+  }
+
+  addDownloadButton(container, canvas) {
+    const buttonWrapper = document.createElement('div');
+    buttonWrapper.style.textAlign = 'center';
+    buttonWrapper.style.marginTop = 'var(--space-lg)';
+
+    const downloadBtn = document.createElement('button');
+    downloadBtn.className = 'btn btn-primary';
+    downloadBtn.innerHTML = `
+      <i class="fas fa-download"></i>
+      <span>Зберегти як картинку</span>
+    `;
+
+    downloadBtn.addEventListener('click', () => {
+      this.downloadRoadmap(canvas);
+    });
+
+    buttonWrapper.appendChild(downloadBtn);
+    container.appendChild(buttonWrapper);
+  }
+
+  downloadRoadmap(canvas) {
+    try {
+      // Convert canvas to blob
+      canvas.toBlob((blob) => {
+        // Create download link
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        // Generate filename with date
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('uk-UA').replace(/\./g, '-');
+        link.download = `roadmap-${dateStr}.png`;
+
+        link.href = url;
+        link.click();
+
+        // Cleanup
+        URL.revokeObjectURL(url);
+
+        Toast.show('Roadmap збережено! 🎉', 'success');
+        Utils.vibrate([50, 30, 50]);
+      }, 'image/png', 1.0);
+    } catch (error) {
+      console.error('Error downloading roadmap:', error);
+      Toast.show('Помилка збереження 😔', 'error');
+    }
   }
 
   roundRect(ctx, x, y, width, height, radius) {
