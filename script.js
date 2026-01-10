@@ -563,6 +563,313 @@ class TransitionManager {
 }
 
 // ============================================
+// CONVERSATION TOPICS DATA
+// ============================================
+
+const CONVERSATION_TOPICS = {
+  fun: [
+    "Яке твоє найдивніше хобі або захоплення?",
+    "Якби ти міг телепортуватись в будь-яку точку світу прямо зараз, куди б поїхав?",
+    "Яка твоя суперсила в ідеальному світі?",
+    "Якби ти міг мати будь-яку тварину як домашню, навіть екзотичну, яку б обрав?",
+    "Яка найсмішніша ситуація траплялась з тобою в громадському місці?",
+    "Якби ти міг стати експертом в чомусь за одну ніч, що б це було?",
+    "Яка пісня завжди піднімає тобі настрій?",
+    "Якби ти міг змінити одну річ у своєму житті без наслідків, що б це було?",
+    "Який твій найбільш embarrassing момент з дитинства?",
+    "Якби ти міг створити свій власний святковий день, що б це було?",
+    "Яке твоє найнезвичайніше кулінарне поєднання, яке тобі подобається?",
+    "Якби ти міг мати обід з будь-якою людиною (живою чи мертвою), хто б це був?"
+  ],
+  deep: [
+    "Який найкращий спогад з дитинства?",
+    "Що тебе найбільше мотивує у житті?",
+    "Яка твоя найбільша мрія?",
+    "Що б ти змінив у собі, якби міг?",
+    "Яка найважливіша цінність для тебе?",
+    "Чого ти найбільше боїшся у житті?",
+    "Який момент змінив твоє життя назавжди?",
+    "Що робить тебе щасливим?",
+    "Яким ти бачиш себе через 5 років?",
+    "Що тебе надихає ставати кращою версією себе?",
+    "Яка твоя найбільша життєва філософія?",
+    "Що для тебе означає успіх?"
+  ],
+  romantic: [
+    "Яке твоє ідеальне побачення?",
+    "Що для тебе найважливіше у стосунках?",
+    "Який твій love language (мова кохання)?",
+    "Яка найромантичніша річ, яку хтось зробив для тебе?",
+    "Вірив/вірила ти в кохання з першого погляду?",
+    "Яке місце ти б хотів/хотіла відвідати разом з коханою людиною?",
+    "Що робить момент особливим для тебе?",
+    "Яка пісня нагадує тобі про кохання?",
+    "Який найкращий комплімент ти отримував/отримувала?",
+    "Як ти розумієш, що закохався/закохалась?",
+    "Що для тебе означає бути коханим/коханою?",
+    "Яке твоє найтепліше спогад про стосунки?"
+  ],
+  unusual: [
+    "Якби ти міг говорити з тваринами, яких би ти обрав?",
+    "В якій історичній епосі ти б хотів/хотіла пожити?",
+    "Якби ти писав автобіографію, яка була б її назва?",
+    "Який незвичайний талант у тебе є?",
+    "Якби ти міг змінити одне правило у світі, що б це було?",
+    "Яка найдивніша річ у твоєму списку бажань?",
+    "Якби ти міг мати розмову зі своїм майбутнім 'я', що б запитав?",
+    "Який альтернативний шлях кар'єри тебе приваблює?",
+    "Якби ти міг створити нову традицію, яка б це була?",
+    "Що найнезвичайнішого ти вивчив/вивчила останнім часом?",
+    "Якби твоє життя було фільмом, який жанр це був би?",
+    "Який найбільш випадковий факт про тебе?",
+    "Якби ти міг мати магічну здібність на один день, яку б обрав?"
+  ],
+  icebreakers: [
+    "Що найкраще сталося сьогодні?",
+    "Яка твоя улюблена пора року і чому?",
+    "Який фільм ти можеш переглядати безліч разів?",
+    "Який твій улюблений спосіб провести вихідні?",
+    "Кава чи чай? І як саме ти любиш?",
+    "Яка твоя comfort food (їжа для комфорту)?",
+    "Який подарунок тебе найбільше здивував?",
+    "Куди ти любиш подорожувати?",
+    "Яка книга справила на тебе найбільше враження?",
+    "Який твій улюблений ресторан чи кафе?",
+    "Що тобі подобається робити для релаксу?",
+    "Який твій улюблений вид мистецтва?"
+  ]
+};
+
+// ============================================
+// CONVERSATION TOPICS COMPONENT
+// ============================================
+
+class ConversationTopics {
+  constructor() {
+    this.element = null;
+    this.currentCategory = 'fun';
+    this.currentTopicIndex = 0;
+    this.favorites = JSON.parse(localStorage.getItem('favoriteTopics') || '[]');
+    this.usedTopics = new Set();
+  }
+
+  render() {
+    const container = document.createElement('div');
+    container.className = 'conversation-topics glass-card';
+    container.innerHTML = `
+      <div class="topics-header">
+        <h3 class="topics-title">💬 Ідеї для розмови</h3>
+        <p class="topics-subtitle">Якщо не знаєш про що поговорити...</p>
+      </div>
+
+      <div class="topics-categories">
+        <button class="topic-category-btn active" data-category="fun">
+          😄 Веселі
+        </button>
+        <button class="topic-category-btn" data-category="deep">
+          💭 Глибокі
+        </button>
+        <button class="topic-category-btn" data-category="romantic">
+          💕 Романтичні
+        </button>
+        <button class="topic-category-btn" data-category="unusual">
+          🎲 Незвичайні
+        </button>
+        <button class="topic-category-btn" data-category="icebreakers">
+          🧊 Початок
+        </button>
+      </div>
+
+      <div class="topic-card-container">
+        <div class="topic-card mystic-card">
+          <div class="topic-content">
+            <p class="topic-text"></p>
+          </div>
+          <button class="topic-favorite-btn" aria-label="Додати до улюблених">
+            <i class="fas fa-star"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="topics-actions">
+        <button class="btn btn-outline topic-next-btn">
+          <i class="fas fa-sync-alt"></i>
+          <span>Наступна тема</span>
+        </button>
+        <button class="btn btn-secondary topic-favorites-btn">
+          <i class="fas fa-heart"></i>
+          <span>Улюблені (<span class="favorites-count">0</span>)</span>
+        </button>
+      </div>
+    `;
+
+    this.element = container;
+    this.bindEvents();
+    this.showRandomTopic();
+    this.updateFavoritesCount();
+
+    return container;
+  }
+
+  bindEvents() {
+    // Category buttons
+    const categoryBtns = this.element.querySelectorAll('.topic-category-btn');
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        categoryBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.currentCategory = btn.dataset.category;
+        this.showRandomTopic();
+      });
+    });
+
+    // Next topic button
+    const nextBtn = this.element.querySelector('.topic-next-btn');
+    nextBtn.addEventListener('click', () => {
+      this.showRandomTopic();
+      Utils.vibrate(30);
+    });
+
+    // Favorite button
+    const favBtn = this.element.querySelector('.topic-favorite-btn');
+    favBtn.addEventListener('click', () => {
+      this.toggleFavorite();
+    });
+
+    // Favorites button
+    const favsBtn = this.element.querySelector('.topic-favorites-btn');
+    favsBtn.addEventListener('click', () => {
+      this.showFavorites();
+    });
+  }
+
+  showRandomTopic() {
+    const topics = CONVERSATION_TOPICS[this.currentCategory];
+    const availableTopics = topics.filter((_, index) =>
+      !this.usedTopics.has(`${this.currentCategory}-${index}`)
+    );
+
+    // Якщо всі теми використані, скидаємо
+    if (availableTopics.length === 0) {
+      this.usedTopics.clear();
+      this.showRandomTopic();
+      return;
+    }
+
+    const randomIndex = Math.floor(Math.random() * topics.length);
+    const topic = topics[randomIndex];
+
+    this.usedTopics.add(`${this.currentCategory}-${randomIndex}`);
+    this.currentTopicIndex = randomIndex;
+
+    const topicText = this.element.querySelector('.topic-text');
+    const topicCard = this.element.querySelector('.topic-card');
+
+    // Анімація зміни тексту
+    topicCard.style.opacity = '0';
+    topicCard.style.transform = 'scale(0.95)';
+
+    setTimeout(() => {
+      topicText.textContent = topic;
+      topicCard.style.opacity = '1';
+      topicCard.style.transform = 'scale(1)';
+      this.updateFavoriteButton();
+    }, 200);
+  }
+
+  toggleFavorite() {
+    const topic = CONVERSATION_TOPICS[this.currentCategory][this.currentTopicIndex];
+    const favoriteKey = `${this.currentCategory}-${this.currentTopicIndex}`;
+
+    const index = this.favorites.indexOf(favoriteKey);
+    if (index > -1) {
+      this.favorites.splice(index, 1);
+      Toast.show('Видалено з улюблених', 'info');
+    } else {
+      this.favorites.push(favoriteKey);
+      Toast.show('Додано до улюблених!', 'success');
+      Utils.vibrate([50, 30, 50]);
+    }
+
+    localStorage.setItem('favoriteTopics', JSON.stringify(this.favorites));
+    this.updateFavoriteButton();
+    this.updateFavoritesCount();
+  }
+
+  updateFavoriteButton() {
+    const favoriteKey = `${this.currentCategory}-${this.currentTopicIndex}`;
+    const isFavorite = this.favorites.includes(favoriteKey);
+    const favBtn = this.element.querySelector('.topic-favorite-btn');
+
+    if (isFavorite) {
+      favBtn.classList.add('active');
+      favBtn.innerHTML = '<i class="fas fa-star"></i>';
+    } else {
+      favBtn.classList.remove('active');
+      favBtn.innerHTML = '<i class="far fa-star"></i>';
+    }
+  }
+
+  updateFavoritesCount() {
+    const countEl = this.element.querySelector('.favorites-count');
+    countEl.textContent = this.favorites.length;
+  }
+
+  showFavorites() {
+    if (this.favorites.length === 0) {
+      Toast.show('У вас ще немає улюблених тем', 'info');
+      return;
+    }
+
+    // Показати модальне вікно з улюбленими темами
+    const favoritesHtml = this.favorites.map(key => {
+      const [category, index] = key.split('-');
+      const topic = CONVERSATION_TOPICS[category][parseInt(index)];
+      return `<div class="favorite-item">
+        <span class="favorite-emoji">${this.getCategoryEmoji(category)}</span>
+        <p>${topic}</p>
+      </div>`;
+    }).join('');
+
+    const modal = document.createElement('div');
+    modal.className = 'topics-modal';
+    modal.innerHTML = `
+      <div class="topics-modal-content glass-card">
+        <button class="topics-modal-close">&times;</button>
+        <h3>💖 Ваші улюблені теми</h3>
+        <div class="favorites-list">${favoritesHtml}</div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add('active'), 10);
+
+    modal.querySelector('.topics-modal-close').addEventListener('click', () => {
+      modal.classList.remove('active');
+      setTimeout(() => modal.remove(), 300);
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+      }
+    });
+  }
+
+  getCategoryEmoji(category) {
+    const emojis = {
+      fun: '😄',
+      deep: '💭',
+      romantic: '💕',
+      unusual: '🎲',
+      icebreakers: '🧊'
+    };
+    return emojis[category] || '💬';
+  }
+}
+
+// ============================================
 // TOAST NOTIFICATIONS
 // ============================================
 
@@ -1662,6 +1969,7 @@ class DateRandomizerApp {
     this.stageComponents = [];
     this.roadmapGenerator = null;
     this.canvas = null;
+    this.conversationTopics = null;
   }
 
   async init() {
@@ -1695,6 +2003,14 @@ class DateRandomizerApp {
       if (timerElement) {
         this.timer = new Timer(timerElement);
         console.log('✅ Timer initialized');
+      }
+
+      // Initialize conversation topics
+      const topicsContainer = Utils.$('#conversationTopicsContainer');
+      if (topicsContainer) {
+        this.conversationTopics = new ConversationTopics();
+        topicsContainer.appendChild(this.conversationTopics.render());
+        console.log('✅ Conversation topics initialized');
       }
 
       // Initialize roadmap generator
