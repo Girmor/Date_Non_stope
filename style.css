@@ -2481,19 +2481,72 @@ body[data-theme="mystic"] .particles {
 
 .topics-container {
   position: fixed;
+  right: 20px;
   bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 600px;
   z-index: 100;
-  pointer-events: none;
+  display: none; /* Hidden by default */
 }
 
+.topics-container.visible {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Floating toggle button */
+.topics-toggle-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(181, 101, 216, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  transition: all 0.3s ease;
+  animation: pulse-glow-btn 2s ease-in-out infinite;
+  z-index: 101;
+}
+
+.topics-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 32px rgba(181, 101, 216, 0.7);
+}
+
+.topics-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+@keyframes pulse-glow-btn {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(181, 101, 216, 0.5);
+  }
+  50% {
+    box-shadow: 0 12px 32px rgba(181, 101, 216, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
+  }
+}
+
+/* Collapsible panel */
 .conversation-topics {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 400px;
+  max-width: calc(100vw - 40px);
   padding: var(--space-lg);
-  margin: 0 auto;
-  animation: slide-up 0.5s ease;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.conversation-topics.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
   pointer-events: all;
 }
 
@@ -2727,11 +2780,18 @@ body[data-theme="mystic"] .particles {
 /* Responsive */
 @media (max-width: 768px) {
   .topics-container {
-    width: 95%;
+    right: 10px;
     bottom: 10px;
   }
 
+  .topics-toggle-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+  }
+
   .conversation-topics {
+    width: calc(100vw - 80px);
     padding: var(--space-md);
   }
 

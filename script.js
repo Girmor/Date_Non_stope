@@ -654,9 +654,16 @@ class ConversationTopics {
   }
 
   render() {
-    const container = document.createElement('div');
-    container.className = 'conversation-topics glass-card';
-    container.innerHTML = `
+    // Create toggle button
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'topics-toggle-btn';
+    toggleBtn.innerHTML = '💬';
+    toggleBtn.setAttribute('aria-label', 'Ідеї для розмови');
+
+    // Create panel
+    const panel = document.createElement('div');
+    panel.className = 'conversation-topics glass-card';
+    panel.innerHTML = `
       <div class="topics-header">
         <h3 class="topics-title">💬 Ідеї для розмови</h3>
         <p class="topics-subtitle">Якщо не знаєш про що поговорити...</p>
@@ -703,12 +710,25 @@ class ConversationTopics {
       </div>
     `;
 
-    this.element = container;
+    // Create wrapper container
+    const wrapper = document.createElement('div');
+    wrapper.appendChild(toggleBtn);
+    wrapper.appendChild(panel);
+
+    this.element = panel;
+    this.toggleBtn = toggleBtn;
+
+    // Toggle button click handler
+    toggleBtn.addEventListener('click', () => {
+      panel.classList.toggle('open');
+      Utils.vibrate(30);
+    });
+
     this.bindEvents();
     this.showRandomTopic();
     this.updateFavoritesCount();
 
-    return container;
+    return wrapper;
   }
 
   bindEvents() {
@@ -866,6 +886,20 @@ class ConversationTopics {
       icebreakers: '🧊'
     };
     return emojis[category] || '💬';
+  }
+
+  show() {
+    const container = Utils.$('#conversationTopicsContainer');
+    if (container) {
+      container.classList.add('visible');
+    }
+  }
+
+  hide() {
+    const container = Utils.$('#conversationTopicsContainer');
+    if (container) {
+      container.classList.remove('visible');
+    }
   }
 }
 
@@ -1084,23 +1118,29 @@ class ProgressBar {
 // ============================================
 
 class Timer {
-  constructor(element) {
+  constructor(element, conversationTopics = null) {
     this.element = element;
     this.textElement = element.querySelector('.timer-text');
     this.intervalId = null;
     this.unlockTime = null;
     this.onComplete = null;
+    this.conversationTopics = conversationTopics;
   }
 
   start(unlockTime, onComplete) {
     this.stop();
     this.unlockTime = unlockTime;
     this.onComplete = onComplete;
-    
+
     this.element.classList.add('active');
     this.update();
-    
+
     this.intervalId = setInterval(() => this.update(), 1000);
+
+    // Show conversation topics when timer starts
+    if (this.conversationTopics) {
+      this.conversationTopics.show();
+    }
   }
 
   update() {
@@ -1123,6 +1163,11 @@ class Timer {
       this.intervalId = null;
     }
     this.element.classList.remove('active');
+
+    // Hide conversation topics when timer stops
+    if (this.conversationTopics) {
+      this.conversationTopics.hide();
+    }
   }
 }
 
@@ -1998,19 +2043,19 @@ class DateRandomizerApp {
         console.log('✅ Progress bar initialized');
       }
 
-      // Initialize timer
-      const timerElement = Utils.$('#globalTimer');
-      if (timerElement) {
-        this.timer = new Timer(timerElement);
-        console.log('✅ Timer initialized');
-      }
-
-      // Initialize conversation topics
+      // Initialize conversation topics first
       const topicsContainer = Utils.$('#conversationTopicsContainer');
       if (topicsContainer) {
         this.conversationTopics = new ConversationTopics();
         topicsContainer.appendChild(this.conversationTopics.render());
         console.log('✅ Conversation topics initialized');
+      }
+
+      // Initialize timer with conversation topics reference
+      const timerElement = Utils.$('#globalTimer');
+      if (timerElement) {
+        this.timer = new Timer(timerElement, this.conversationTopics);
+        console.log('✅ Timer initialized');
       }
 
       // Initialize roadmap generator
