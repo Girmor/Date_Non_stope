@@ -2402,26 +2402,28 @@ body[data-theme="mystic"]::before {
   z-index: 0;
 }
 
-/* Туман/дим ефект */
+/* Туман/дим ефект з пурпурним відтінком */
 body[data-theme="mystic"]::after {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse at 30% 50%, rgba(157, 132, 255, 0.15), transparent 50%),
-    radial-gradient(ellipse at 70% 20%, rgba(224, 195, 252, 0.1), transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(255, 215, 0, 0.08), transparent 50%);
+    radial-gradient(ellipse at 30% 50%, rgba(181, 101, 216, 0.2), transparent 50%),
+    radial-gradient(ellipse at 70% 20%, rgba(139, 63, 175, 0.15), transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(224, 195, 252, 0.12), transparent 50%),
+    radial-gradient(ellipse at 20% 70%, rgba(255, 215, 0, 0.08), transparent 50%);
   animation: smoke-float 15s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Містичний градієнт для body */
+/* Містичний пурпурний градієнт для body */
 body[data-theme="mystic"] {
   background: radial-gradient(ellipse at top,
-    var(--bg-gradient-middle) 0%,
-    var(--bg-gradient-start) 50%,
-    #0a0420 100%);
+    #8B3FAF 0%,
+    var(--bg-gradient-middle) 30%,
+    var(--bg-gradient-start) 60%,
+    #1a0a2e 100%);
   background-attachment: fixed;
 }
 

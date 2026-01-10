@@ -328,17 +328,17 @@ const THEMES = {
   mystic: {
     name: 'Місячна магія',
     icon: '🔮',
-    primary: '#9D84FF',
+    primary: '#B565D8',
     secondary: '#FFD700',
     accent: '#E0C3FC',
-    bgGradientStart: '#1a0933',
-    bgGradientMiddle: '#2d1b4e',
-    bgGradientEnd: '#1a0933',
-    glassBg: 'rgba(157, 132, 255, 0.1)',
-    glassBorder: 'rgba(157, 132, 255, 0.3)',
-    textPrimary: '#E0E6FF',
-    textSecondary: '#B8B8D4',
-    glow: '0 0 20px rgba(157, 132, 255, 0.5), 0 0 40px rgba(157, 132, 255, 0.3)',
+    bgGradientStart: '#2D1B40',
+    bgGradientMiddle: '#6B2E8C',
+    bgGradientEnd: '#2D1B40',
+    glassBg: 'rgba(181, 101, 216, 0.15)',
+    glassBorder: 'rgba(181, 101, 216, 0.35)',
+    textPrimary: '#F0E6FF',
+    textSecondary: '#C8B8D4',
+    glow: '0 0 25px rgba(181, 101, 216, 0.6), 0 0 50px rgba(181, 101, 216, 0.4)',
     particleColor: '#FFD700'
   }
 };
@@ -1318,7 +1318,6 @@ class MysticStageComponent extends StageComponent {
     const spinBtn = this.element.querySelector('.btn-spin');
 
     spinBtn.disabled = true;
-    display.classList.add('visible');
     confirmActions.classList.remove('visible');
 
     // Містичний ефект та звук
@@ -1328,38 +1327,38 @@ class MysticStageComponent extends StageComponent {
     Utils.vibrate([50, 30, 50]);
 
     const options = this.data.options;
-    const cycles = Math.floor(CONFIG.SPIN_DURATION / CONFIG.SPIN_INTERVAL);
+
+    // Спочатку вибираємо випадковий результат
+    const selectedIndex = Math.floor(Math.random() * options.length);
+    const selected = options[selectedIndex];
+
+    // Встановлюємо картинку до початку анімації
+    img.src = selected.image;
+    name.textContent = selected.text;
+
+    // Показуємо display
+    display.classList.add('visible');
+
+    // Короткий spin ефект з обертанням
+    const cycles = 20; // Менше циклів для швидшого ефекту
     let count = 0;
 
-    // Flip card and cycle through options
     await new Promise(resolve => {
       const interval = setInterval(() => {
-        const opt = options[count % options.length];
-        img.src = opt.image;
-        name.textContent = opt.text;
-
-        // Add flip animation
-        cardWrapper.style.transform = `rotateY(${count * 45}deg)`;
-
+        // Обертання картки
+        cardWrapper.style.transform = `rotateY(${count * 30}deg)`;
         soundManager?.playSpin();
-
         count++;
 
         if (count >= cycles) {
           clearInterval(interval);
           resolve();
         }
-      }, CONFIG.SPIN_INTERVAL);
+      }, 50); // Швидше обертання
     });
 
-    // Final selection
-    const selectedIndex = Math.floor(Math.random() * options.length);
-    const selected = options[selectedIndex];
-
-    img.src = selected.image;
-    name.textContent = selected.text;
-
-    // Final flip to show image
+    // Фінальний flip щоб показати картинку
+    cardWrapper.style.transform = '';
     cardWrapper.classList.add('flipped');
 
     this.element.classList.remove('mystic-spinning');
