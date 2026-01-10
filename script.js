@@ -1903,34 +1903,60 @@ class RoadmapGenerator {
       const y = currentY + (stageIndex === 0 ? 20 : 0); // Менший відступ для першого елемента
 
       // Завантажити і намалювати міні-фото
+      const imgSize = 50;
+      const imgX = pathX - 100;
+      const imgY = y - imgSize / 2;
+
       try {
         const img = new Image();
-        img.src = option.image;
+        img.crossOrigin = 'anonymous';
+
+        let imageLoaded = false;
+
         await new Promise((resolve) => {
-          img.onload = resolve;
-          img.onerror = resolve; // Продовжити навіть якщо фото не завантажилось
+          img.onload = () => {
+            imageLoaded = true;
+            resolve();
+          };
+          img.onerror = () => {
+            console.warn('Image failed:', option.image);
+            resolve();
+          };
+          img.src = option.image;
+          setTimeout(resolve, 2000);
         });
 
-        // Малюємо круглу міні-фотографію
-        const imgSize = 50; // Зменшено з 60
-        const imgX = pathX - 100; // Ближче до центру
-        const imgY = y - imgSize / 2;
+        if (imageLoaded) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
+          ctx.clip();
+          ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+          ctx.restore();
 
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
-        ctx.restore();
+          ctx.beginPath();
+          ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
+          ctx.strokeStyle = '#ffd700';
+          ctx.lineWidth = 3;
+          ctx.stroke();
+        } else {
+          // Placeholder
+          ctx.beginPath();
+          ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(181, 101, 216, 0.3)';
+          ctx.fill();
+          ctx.strokeStyle = '#ffd700';
+          ctx.lineWidth = 3;
+          ctx.stroke();
 
-        // Рамка навколо фото
-        ctx.beginPath();
-        ctx.arc(imgX + imgSize / 2, imgY + imgSize / 2, imgSize / 2, 0, Math.PI * 2);
-        ctx.strokeStyle = '#ffd700';
-        ctx.lineWidth = 3;
-        ctx.stroke();
+          ctx.font = '24px serif';
+          ctx.fillStyle = '#fff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(stage.emoji, imgX + imgSize / 2, imgY + imgSize / 2);
+        }
       } catch (e) {
-        console.warn('Failed to load image:', option.image);
+        console.warn('Error:', e);
       }
 
       // Stage circle з емоджі
