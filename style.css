@@ -2484,11 +2484,11 @@ body[data-theme="mystic"] .particles {
   right: 20px;
   bottom: 20px;
   z-index: 100;
-  display: none; /* Hidden by default */
+  display: none !important; /* Hidden by default */
 }
 
 .topics-container.visible {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
   align-items: flex-end;
 }
